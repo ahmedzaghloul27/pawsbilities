@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'verify_phone_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -10,6 +11,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
 
+  // Controllers for user data
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -18,6 +20,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String? _selectedGender;
 
+  // Date picker for Date of Birth
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -35,9 +38,16 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _onSignUpPressed() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Handle sign-up logic here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Signing Up...')),``
+      // Navigate to VerifyPhonePage, passing phone, first and last name
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VerifyPhonePage(
+            phoneNumber: _phoneController.text,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+          ),
+        ),
       );
     }
   }
@@ -64,13 +74,13 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Back arrow
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(height: 20),
+                // Title
                 const Text(
                   "Get on Board!",
                   style: TextStyle(
@@ -79,6 +89,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Subtitle
                 const Text(
                   "Create your profile and find your purrfect match",
                   style: TextStyle(
@@ -88,6 +99,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // First & Last Name
                 Row(
                   children: [
                     Expanded(
@@ -128,6 +140,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Email
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -147,6 +160,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Phone
                 TextFormField(
                   controller: _phoneController,
                   decoration: InputDecoration(
@@ -164,6 +178,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Date of Birth
                 TextFormField(
                   controller: _dobController,
                   readOnly: true,
@@ -185,6 +200,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Gender
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                     labelText: "Gender",
@@ -210,6 +226,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Sign Up Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -228,6 +245,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // OR divider row
                 const Row(
                   children: [
                     Expanded(child: Divider(thickness: 1)),
@@ -239,6 +257,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Social Media Sign Up
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -258,13 +277,15 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Already have an account? Log In
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Already have an account? "),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, '/signin');
+                        // Navigate to Sign In page
+                        // e.g. Navigator.pushNamed(context, '/signin');
                       },
                       child: const Text(
                         "Log In",

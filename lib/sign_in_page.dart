@@ -25,11 +25,11 @@ class _SignInPageState extends State<SignInPage> {
 
   void _onLoginPressed() {
     if (_formKey.currentState?.validate() ?? false) {
-      Navigator.push(
+      /* Navigator.push(
         context,
-        MaterialPageRoute(
+    MaterialPageRoute(
             builder: (context) => const ProfileSetupCompletePage()),
-      );
+      ); */
     }
   }
 

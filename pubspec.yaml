@@ -4,17 +4,16 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
 
-
 dependencies:
   flutter:
     sdk: flutter
-
+  image_picker:
+  font_awesome_flutter: ^10.5.0
 
 
   cupertino_icons: ^1.0.6
@@ -22,19 +21,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
   flutter_lints: ^3.0.0
-
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/logo.png
-
-
-
 
   # fonts:
   #   - family: Schyler
@@ -47,4 +40,3 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
-  #

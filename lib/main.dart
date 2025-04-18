@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pawsbilities_app/settings.dart';
 import 'package:pawsbilities_app/welcome_page.dart';
+import 'My_profilePage.dart';
+import 'Notifications.dart';
+import 'SetPetProfilePage.dart';
 import 'sign_up_page.dart';
 import 'sign_in_page.dart';
 import 'forgot_password_page.dart';
@@ -21,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const WelcomePage(),
+      home: const MyProfilePage(),
       routes: {
         '/signup': (context) => const SignUpPage(),
         '/signin': (context) => const SignInPage(),
