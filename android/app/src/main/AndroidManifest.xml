@@ -1,10 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<<<<<<< HEAD
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="pet_menu_bar"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
+=======
+    <application
+        android:label="my_project_name"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e
         <activity
             android:name=".MainActivity"
             android:exported="true"

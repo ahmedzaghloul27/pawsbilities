@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # pet_menu_bar
+=======
+# my_project_name
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e
 
 A new Flutter project.
 

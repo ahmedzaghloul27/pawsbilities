@@ -139,6 +139,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+<<<<<<< HEAD
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -147,6 +148,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+=======
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e
   sky_engine:
     dependency: transitive
     description: flutter
@@ -216,6 +219,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "13.0.0"
+<<<<<<< HEAD
   webview_flutter:
     dependency: "direct main"
     description:
@@ -251,3 +255,7 @@ packages:
 sdks:
   dart: ">=3.3.0 <4.0.0"
   flutter: ">=3.16.6"
+=======
+sdks:
+  dart: ">=3.3.0 <4.0.0"
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e

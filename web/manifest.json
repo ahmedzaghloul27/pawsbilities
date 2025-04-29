@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "pet_menu_bar",
     "short_name": "pet_menu_bar",
+=======
+    "name": "my_project_name",
+    "short_name": "my_project_name",
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

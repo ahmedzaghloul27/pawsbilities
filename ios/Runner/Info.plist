@@ -5,7 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
+<<<<<<< HEAD
 	<string>Pet Menu Bar</string>
+=======
+	<string>My Project Name</string>
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +17,11 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
+<<<<<<< HEAD
 	<string>pet_menu_bar</string>
+=======
+	<string>my_project_name</string>
+>>>>>>> 1b5ddccc526016c19f045e2d6d03e04e2e3ca22e
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
