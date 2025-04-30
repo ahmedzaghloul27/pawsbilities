@@ -24,49 +24,134 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Your account'),
-            subtitle: const Text('See information about your account.'),
+            title: const Text(
+              'Your account',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'See information about your account.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const YourAccountPage()),
           ),
           ListTile(
             leading: const Icon(Icons.filter_list),
-            title: const Text('Matching Preferences'),
-            subtitle: const Text('Set your match distance, location, etc.'),
+            title: const Text(
+              'Matching Preferences',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Set your match distance, location, etc.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const MatchPreferencesPage()),
           ),
           ListTile(
             leading: const Icon(Icons.lock),
-            title: const Text('Two-factor authentication'),
-            subtitle: const Text('Require a second authentication method.'),
+            title: const Text(
+              'Two-factor authentication',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Require a second authentication method.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const TwoFactorAuthPage()),
           ),
           ListTile(
             leading: const Icon(Icons.notifications),
-            title: const Text('Notifications'),
-            subtitle: const Text('Select the notifications you get.'),
+            title: const Text(
+              'Notifications',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Select the notifications you get.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const NotificationsPage()),
           ),
           ListTile(
             leading: const Icon(Icons.help_center),
-            title: const Text('Help center'),
-            subtitle: const Text('Get in touch and we will help you.'),
+            title: const Text(
+              'Help center',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Get in touch and we will help you.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const HelpCenterPage()),
           ),
           ListTile(
             leading: const Icon(Icons.question_answer),
-            title: const Text('FAQ'),
-            subtitle: const Text('Your guide to finding the perfect match.'),
+            title: const Text(
+              'FAQ',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Your guide to finding the perfect match.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const FAQPage()),
           ),
           ListTile(
             leading: const Icon(Icons.info),
-            title: const Text('About'),
-            subtitle: const Text('Know more about Pawsibilities.'),
+            title: const Text(
+              'About',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Know more about Pawsibilities.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+              ),
+            ),
             onTap: () => _navigateTo(context, const AboutPage()),
           ),
           const Divider(),
@@ -74,7 +159,11 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text(
               'Sign out',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(
+                color: Colors.red,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+              ),
             ),
             onTap: () => _navigateTo(context, const SignInPage()), //for now
           ),

@@ -12,22 +12,36 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  image_picker:
-  font_awesome_flutter: ^10.5.0
-
-
   cupertino_icons: ^1.0.6
+  image_picker: ^1.0.7
+  font_awesome_flutter: ^10.5.0
+  convex_bottom_bar: ^3.2.0
+  circle_nav_bar: ^2.2.0
+  flutter_svg: ^2.0.9
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/logo.png
+    - assets/icons/
+
+  # fonts:
+  #   - family: Poppins
+  #     fonts:
+  #       - asset: assets/fonts/Poppins-Regular.ttf
+  #       - asset: assets/fonts/Poppins-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Poppins-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Poppins-Bold.ttf
+  #         weight: 700
 
   # fonts:
   #   - family: Schyler

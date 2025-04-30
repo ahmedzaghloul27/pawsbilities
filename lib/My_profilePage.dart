@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pawsbilities_app/settings.dart';
+import 'dart:ui'; // Add this import for ImageFilter
+import 'package:pawsbilities_app/matching_screen.dart'; // Add this import
+import 'widgets/custom_nav_bar.dart';
+import 'settings.dart';
 
-class MyProfilePage extends StatelessWidget {
+class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
+
+  @override
+  State<MyProfilePage> createState() => _MyProfilePageState();
+}
+
+ 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBody: true,
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              const EdgeInsets.fromLTRB(16, 0, 16, 80), // Added bottom padding
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -73,7 +84,7 @@ class MyProfilePage extends StatelessWidget {
                         ),
                         SizedBox(height: 6),
                         Text(
-                          "I'm a software engineer and happy to be here on the app",
+                          "I'm a software and hapy to be here on the app",
                           style: TextStyle(fontSize: 13),
                         ),
                       ],
@@ -85,19 +96,21 @@ class MyProfilePage extends StatelessWidget {
 
               // Edit Button
               Center(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFB88C59),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFB88C59),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 100, vertical: 12),
-                  ),
-                  child: const Text(
-                    'Edit my profile',
-                    style: TextStyle(color: Colors.white),
+                    child: const Text(
+                      'Edit my profile',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ),
@@ -141,70 +154,17 @@ class MyProfilePage extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               const PostCard(),
+              const SizedBox(height: 16),
+              const PostCard(),
+              const SizedBox(height: 16),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
-        child: BottomAppBar(
-          color: Colors.black87,
-          elevation: 3,
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 7,
-          child: SizedBox(
-            height: 60,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.home,
-                    size: 28,
-                  ),
-                  color: Colors.white,
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.search,
-                    size: 28,
-                  ),
-                  color: Colors.white,
-                  onPressed: () {},
-                ),
-                const SizedBox(width: 40),
-                IconButton(
-                  icon: const Icon(
-                    Icons.explore_sharp,
-                    size: 28,
-                  ),
-                  color: Colors.white,
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.person,
-                    size: 28,
-                  ),
-                  color: Colors.white,
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ),
-        ),
+      bottomNavigationBar: CustomNavBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFB88C59),
-        onPressed: () {},
-        child: const FaIcon(
-          FontAwesomeIcons.paw,
-          color: Colors.white,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
     );
   }
 }
@@ -244,7 +204,7 @@ class PostCard extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         const Text(
-          'My pup has been lonely up until now so we’d love for him to make new friends and socialize❤️‼️',
+          'My pup has been lonely up until now so we\'d love for him to make new friends and socialize❤️‼️',
         ),
         const SizedBox(height: 10),
         ClipRRect(

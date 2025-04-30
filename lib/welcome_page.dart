@@ -78,7 +78,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 40),
                     const Text(
-                      "By tapping 'Create account' or 'Sign in' you agree to our Terms and Conditions",
+                      "By 'Create account' or 'Sign in' you agree to our Terms and Conditions",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
