@@ -16,7 +16,6 @@ dependencies:
   image_picker: ^1.0.7
   font_awesome_flutter: ^10.5.0
   convex_bottom_bar: ^3.2.0
-  circle_nav_bar: ^2.2.0
   flutter_svg: ^2.0.9
   
 
@@ -30,18 +29,24 @@ flutter:
 
   assets:
     - assets/images/logo.png
+    - assets/images/Profile_pic.jpg
+    - assets/images/matchscreen_design.png 
+    - assets/images/dog.png
+    - assets/images/dog2.jpg
+    - assets/images/dog3.jpg
+    - assets/images/dog4.jpg
     - assets/icons/
 
-  # fonts:
-  #   - family: Poppins
-  #     fonts:
-  #       - asset: assets/fonts/Poppins-Regular.ttf
-  #       - asset: assets/fonts/Poppins-Medium.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/Poppins-SemiBold.ttf
-  #         weight: 600
-  #       - asset: assets/fonts/Poppins-Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
 
   # fonts:
   #   - family: Schyler
