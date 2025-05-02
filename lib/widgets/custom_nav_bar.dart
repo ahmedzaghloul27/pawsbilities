@@ -100,8 +100,8 @@ class CustomNavBar extends StatelessWidget {
         height: 65,
         curveSize: 90,
         top: -30,
-        cornerRadius: 30,
-        elevation: 5,
+        cornerRadius: 35,
+        elevation: 4,
       ),
     );
   }

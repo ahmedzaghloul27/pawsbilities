@@ -145,7 +145,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       ),
                                       SizedBox(height: 5),
                                       Icon(Icons.circle,
-                                          color:  Colors.green, size: 10),
+                                          color: Colors.green, size: 10),
                                     ],
                                   ),
                                   SizedBox(width: 2),
@@ -206,7 +206,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             'Edit my profile',
                             style: TextStyle(
                               color: Color.fromARGB(255, 255, 237, 237),
-                              fontFamily: 'Poppins',
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                             ),
