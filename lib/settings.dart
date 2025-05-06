@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pawsbilities_app/sign_in_page.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -36,7 +37,8 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: SvgPicture.asset('assets/icons/settings_profile_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'Your account',
               style: TextStyle(
@@ -53,7 +55,8 @@ class SettingsPage extends StatelessWidget {
             onTap: () => _navigateTo(context, const YourAccountPage()),
           ),
           ListTile(
-            leading: const Icon(Icons.filter_list),
+            leading: SvgPicture.asset('assets/icons/matching_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'Matching Preferences',
               style: TextStyle(
@@ -70,7 +73,8 @@ class SettingsPage extends StatelessWidget {
             onTap: () => _navigateTo(context, const MatchPreferencesPage()),
           ),
           ListTile(
-            leading: const Icon(Icons.lock),
+            leading: SvgPicture.asset('assets/icons/Lock_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'Two-factor authentication',
               style: TextStyle(
@@ -87,7 +91,8 @@ class SettingsPage extends StatelessWidget {
             onTap: () => _navigateTo(context, const TwoFactorAuthPage()),
           ),
           ListTile(
-            leading: const Icon(Icons.notifications),
+            leading: SvgPicture.asset('assets/icons/Bell_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'Notifications',
               style: TextStyle(
@@ -104,7 +109,8 @@ class SettingsPage extends StatelessWidget {
             onTap: () => _navigateTo(context, const NotificationsPage()),
           ),
           ListTile(
-            leading: const Icon(Icons.help_center),
+            leading: SvgPicture.asset('assets/icons/Help_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'Help center',
               style: TextStyle(
@@ -121,7 +127,8 @@ class SettingsPage extends StatelessWidget {
             onTap: () => _navigateTo(context, const HelpCenterPage()),
           ),
           ListTile(
-            leading: const Icon(Icons.question_answer),
+            leading: SvgPicture.asset('assets/icons/faq_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'FAQ',
               style: TextStyle(
@@ -138,7 +145,8 @@ class SettingsPage extends StatelessWidget {
             onTap: () => _navigateTo(context, const FAQPage()),
           ),
           ListTile(
-            leading: const Icon(Icons.info),
+            leading: SvgPicture.asset('assets/icons/Info_icon.svg',
+                width: 26, height: 26),
             title: const Text(
               'About',
               style: TextStyle(
@@ -156,7 +164,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
+            leading: Icon(Icons.logout, color: Colors.red),
             title: const Text(
               'Sign out',
               style: TextStyle(

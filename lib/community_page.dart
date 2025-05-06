@@ -7,6 +7,7 @@ import 'matching_screen.dart';
 import 'discover_page.dart';
 import 'My_profilePage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'create_post_screen.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -112,6 +113,21 @@ class _CommunityPageState extends State<CommunityPage> {
     }
   }
 
+  void _showCreatePostModal() async {
+    // Now navigates to CreatePostScreen and handles result
+    final newPost = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CreatePostScreen(),
+      ),
+    );
+    if (newPost != null && newPost is Map<String, dynamic>) {
+      setState(() {
+        posts.insert(0, newPost);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,7 +177,11 @@ class _CommunityPageState extends State<CommunityPage> {
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final post = posts[index];
+                    if (index == 0) {
+                      // Create Post Widget at the top
+                      return CreatePostWidget(onTap: _showCreatePostModal);
+                    }
+                    final post = posts[index - 1];
                     return Column(
                       children: [
                         PostWidget(
@@ -177,12 +197,12 @@ class _CommunityPageState extends State<CommunityPage> {
                           onSharePressed: () {},
                           onMorePressed: () {},
                         ),
-                        if (index < posts.length - 1)
+                        if (index - 1 < posts.length - 1)
                           const SizedBox(height: 16),
                       ],
                     );
                   },
-                  childCount: posts.length,
+                  childCount: posts.length + 1, // +1 for create post
                 ),
               ),
             ),
@@ -192,6 +212,65 @@ class _CommunityPageState extends State<CommunityPage> {
       bottomNavigationBar: CustomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class CreatePostWidget extends StatelessWidget {
+  final VoidCallback? onTap;
+  const CreatePostWidget({super.key, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 22,
+            backgroundImage: NetworkImage(
+                'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d'),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: GestureDetector(
+              onTap: onTap,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: const Text(
+                  "What's on your pup mind?",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          IconButton(
+            icon: Icon(Icons.photo_camera, color: Colors.grey[600]),
+            onPressed: onTap,
+          ),
+        ],
       ),
     );
   }

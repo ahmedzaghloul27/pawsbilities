@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PostWidget extends StatelessWidget {
   final String profileImageUrl;
@@ -49,86 +50,99 @@ class PostWidget extends StatelessWidget {
           children: [
             // Post Header
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(profileImageUrl),
-                ),
-                const SizedBox(width: 10),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                      ),
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: NetworkImage(profileImageUrl),
                     ),
-                    Text(
-                      timeAgo,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                        color: Colors.grey[600],
-                      ),
-                    ),
+                    const SizedBox(height: 18), // Space under avatar
                   ],
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.more_horiz),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: onMorePressed,
-                )
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            userName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            timeAgo,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.more_horiz),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: onMorePressed,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // Post Content
+                      Text(
+                        content,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Post Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: imageUrl.startsWith('http')
+                            ? Image.network(
+                                imageUrl,
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    width: double.infinity,
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.error_outline,
+                                        color: Colors.grey),
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                imageUrl,
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    width: double.infinity,
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.error_outline,
+                                        color: Colors.grey),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            ),
-            const SizedBox(height: 12),
-            // Post Content
-            Text(
-              content,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Post Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: imageUrl.startsWith('http')
-                  ? Image.network(
-                      imageUrl,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 200,
-                          width: double.infinity,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.error_outline,
-                              color: Colors.grey),
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      imageUrl,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 200,
-                          width: double.infinity,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.error_outline,
-                              color: Colors.grey),
-                        );
-                      },
-                    ),
             ),
             // Post Actions
             Padding(
@@ -158,8 +172,12 @@ class PostWidget extends StatelessWidget {
                     onTap: onCommentPressed,
                     child: Row(
                       children: [
-                        Icon(Icons.chat_bubble_outline,
-                            size: 20, color: Colors.grey[600]),
+                        SvgPicture.asset(
+                          'assets/icons/comment.svg',
+                          width: 20,
+                          height: 20,
+                          color: Colors.grey[600],
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           commentsCount.toString(),
@@ -175,7 +193,12 @@ class PostWidget extends StatelessWidget {
                   const Spacer(),
                   InkWell(
                     onTap: onSharePressed,
-                    child: Icon(Icons.share, size: 20, color: Colors.grey[600]),
+                    child: SvgPicture.asset(
+                      'assets/icons/share_icon.svg',
+                      width: 20,
+                      height: 20,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),

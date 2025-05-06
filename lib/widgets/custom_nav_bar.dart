@@ -98,7 +98,7 @@ class CustomNavBar extends StatelessWidget {
         color: const Color.fromARGB(255, 255, 255, 255),
         style: TabStyle.fixedCircle,
         height: 65,
-        curveSize: 90,
+        curveSize: 95,
         top: -30,
         cornerRadius: 35,
         elevation: 4,
