@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'sign_up_page.dart';
 import 'sign_in_page.dart';
+import 'widgets/custom_button.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -10,6 +11,12 @@ class WelcomePage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/welcome_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
           SafeArea(
             child: Center(
               child: Padding(
@@ -19,70 +26,86 @@ class WelcomePage extends StatelessWidget {
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      height: 280,
+                      height: 240,
+                    ),
+                    Image.asset(
+                      'assets/images/paw_txt.png',
+                      height: 54,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 90),
+                    CustomButton(
+                      text: 'Sign Up',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignUpPage()),
+                        );
+                      },
+                      backgroundColor: const Color(0xFFB38E5D),
+                      textColor: Colors.white,
+                      borderRadius: 50,
+                      height: 50,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      "Pawsibilities",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    CustomButton(
+                      text: 'Log In',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignInPage()),
+                        );
+                      },
+                      backgroundColor: Color.fromARGB(255, 0, 0, 0),
+                      textColor: Color.fromARGB(255, 255, 255, 255),
+                      borderRadius: 50,
+                      borderColor: Colors.black,
+                      height: 50,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      borderWidth: 2,
                     ),
                     const SizedBox(height: 40),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB38E5D),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontFamily: 'Poppins',
                           ),
+                          children: [
+                            const TextSpan(
+                                text:
+                                    "By tapping 'Create account' or 'Sign in' you agree to our "),
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Terms and Conditions tapped')),
+                                  );
+                                },
+                                child: Text(
+                                  'Terms and Conditions',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    decoration: TextDecoration.underline,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpPage()),
-                          );
-                        },
-                        child: const Text(
-                          "Sign Up",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignInPage()),
-                          );
-                        },
-                        child: const Text(
-                          "Log In",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    const Text(
-                      "By 'Create account' or 'Sign in' you agree to our Terms and Conditions",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
                       ),
                     ),
                   ],

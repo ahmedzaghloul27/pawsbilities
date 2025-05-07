@@ -37,6 +37,12 @@ flutter:
     - assets/images/dog2.jpg
     - assets/images/dog3.jpg
     - assets/images/dog4.jpg
+    - assets/images/avatar.png
+    - assets/images/location_enable.png
+    - assets/images/notification_enable.png
+    - assets/images/matches_done.png
+    - assets/images/welcome_bg.png
+    - assets/images/paw_txt.png
     - assets/icons/
     
 

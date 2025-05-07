@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'set_profile_picture_page.dart';
+import 'widgets/custom_button.dart';
 
 class VerifyPhonePage extends StatefulWidget {
   final String phoneNumber;
@@ -23,7 +24,7 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
   // Generate 6 controllers for each digit of the verification code
   final List<TextEditingController> _controllers = List.generate(
     6,
-        (_) => TextEditingController(),
+    (_) => TextEditingController(),
   );
 
   @override
@@ -66,48 +67,70 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Back arrow
               IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 onPressed: () => Navigator.of(context).pop(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
               const SizedBox(height: 16),
-              // Title
               const Text(
                 "Enter your code",
                 style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Poppins',
                 ),
               ),
-              const SizedBox(height: 8),
-              // Display phone number
+              const SizedBox(height: 6),
               Text(
                 widget.phoneNumber,
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                style: const TextStyle(
+                    fontSize: 16, color: Colors.black87, fontFamily: 'Poppins'),
               ),
-              const SizedBox(height: 24),
-              // 6-digit input fields
+              const SizedBox(height: 28),
               Form(
                 key: _formKey,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(6, (index) {
                     return SizedBox(
-                      width: 40,
+                      width: 44,
                       child: TextFormField(
                         controller: _controllers[index],
+                        style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins'),
                         decoration: InputDecoration(
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 12),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFB38E5D), width: 2),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFB38E5D), width: 2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFB38E5D), width: 2),
                           ),
                           counterText: '',
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         textAlign: TextAlign.center,
                         maxLength: 1,
@@ -122,24 +145,16 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
                   }),
                 ),
               ),
-              const SizedBox(height: 40),
-              // Next Button
-              SizedBox(
-                width: double.infinity,
+              const SizedBox(height: 32),
+              CustomButton(
+                text: "Next",
+                onPressed: _onNextPressed,
+                backgroundColor: const Color(0xFFB38E5D),
+                textColor: Colors.white,
+                borderRadius: 30,
                 height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFB38E5D),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  onPressed: _onNextPressed,
-                  child: const Text(
-                    "Next",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
             ],
           ),

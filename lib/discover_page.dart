@@ -4,6 +4,8 @@ import 'community_page.dart';
 import 'lost_and_found_page.dart';
 import 'matching_screen.dart';
 import 'My_profilePage.dart';
+import 'widgets/sticky_header.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -54,26 +56,59 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+     backgroundColor: Colors.white,
       extendBody: false,
-      appBar: AppBar(
-        title: const Text(
-          'Discover',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: const Center(
-        child: Text(
-          'Discover Page Content',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-          ),
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              pinned: true,
+              floating: false,
+              expandedHeight: 77,
+              flexibleSpace: StickyHeader(
+                title: 'Discover',
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/Bell_icon.svg',
+                        width: 24,
+                        height: 24,
+                      ),
+                      onPressed: () {
+                        // TODO: Navigate to notifications screen
+                      },
+                    ),
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/Chat_icon.svg',
+                        width: 24,
+                        height: 24,
+                      ),
+                      onPressed: () {
+                        // TODO: Navigate to chat screen
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverFillRemaining(
+              child: Center(
+                child: Text(
+                  'Discover Page Content',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: CustomNavBar(

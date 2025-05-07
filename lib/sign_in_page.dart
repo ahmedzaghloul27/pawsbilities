@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pawsbilities_app/sign_up_page.dart';
 import 'forgot_password_page.dart';
 import 'profile_setup_complete.dart';
+import 'widgets/custom_button.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -15,6 +16,7 @@ class _SignInPageState extends State<SignInPage> {
 
   final TextEditingController _emailOrPhoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -36,44 +38,63 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                 ),
                 const SizedBox(height: 16),
-
-                // Title
                 const Text(
                   "Welcome Back!",
                   style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Poppins',
                   ),
                 ),
-                const SizedBox(height: 8),
-
-                // Subtitle
+                const SizedBox(height: 4),
                 const Text(
                   "Your furry friend's world awaits.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black87,
+                      fontFamily: 'Poppins'),
                 ),
-                const SizedBox(height: 24),
-
+                const SizedBox(height: 28),
                 TextFormField(
                   controller: _emailOrPhoneController,
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: "Email or Phone Number",
+                    hintText: "Email or Phone Number",
+                    hintStyle: const TextStyle(
+                        color: Colors.grey, fontFamily: 'Poppins'),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFB38E5D), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -82,17 +103,45 @@ class _SignInPageState extends State<SignInPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: "Password",
+                    hintText: "Password",
+                    hintStyle: const TextStyle(
+                        color: Colors.grey, fontFamily: 'Poppins'),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFB38E5D), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
                   ),
-                  obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Enter your password';
@@ -101,7 +150,6 @@ class _SignInPageState extends State<SignInPage> {
                   },
                 ),
                 const SizedBox(height: 8),
-
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -114,88 +162,79 @@ class _SignInPageState extends State<SignInPage> {
                       );
                     },
                     child: const Text(
-                      "Forgot password?",
-                      style: TextStyle(color: Colors.blue),
+                      "Forgot Password?",
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 15,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: 18),
+                CustomButton(
+                  text: "Log in",
+                  onPressed: _onLoginPressed,
+                  backgroundColor: const Color(0xFFB38E5D),
+                  textColor: Colors.white,
+                  borderRadius: 30,
                   height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFB38E5D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    onPressed: _onLoginPressed,
-                    child: const Text(
-                      "Log In",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
                 ),
-                const SizedBox(height: 16),
-
-                const Row(
+                const SizedBox(height: 14),
+                Row(
                   children: [
-                    Expanded(child: Divider(thickness: 1)),
+                    const Expanded(child: Divider(thickness: 2)),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text("OR"),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text("OR",
+                          style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54)),
                     ),
-                    Expanded(child: Divider(thickness: 1)),
+                    const Expanded(child: Divider(thickness: 1)),
                   ],
                 ),
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: 14),
+                CustomButton(
+                  text: "Continue with Google",
+                  onPressed: () {},
+                  variant: CustomButtonVariant.outlined,
+                  borderColor: Colors.black,
+                  borderWidth: 2,
+                  borderRadius: 30,
                   height: 50,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.android),
-                    label: const Text(
-                      "Continue with Google",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    onPressed: () {},
-                  ),
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  textColor: Colors.black,
+                  prefixIcon: const Icon(Icons.g_mobiledata,
+                      color: Colors.black, size: 28),
+                  backgroundColor: Colors.white,
                 ),
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: 14),
+                CustomButton(
+                  text: "Continue with Apple",
+                  onPressed: () {},
+                  variant: CustomButtonVariant.outlined,
+                  borderColor: Colors.black,
+                  borderWidth: 2,
+                  borderRadius: 30,
                   height: 50,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.apple),
-                    label: const Text(
-                      "Continue with Apple",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    onPressed: () {
-                      // Handle Apple sign in
-                    },
-                  ),
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  textColor: Colors.black,
+                  prefixIcon:
+                      const Icon(Icons.apple, color: Colors.black, size: 24),
+                  backgroundColor: Colors.white,
                 ),
-                const SizedBox(height: 24),
-
+                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("New to Pawssibilities? "),
+                    const Text("New to Pawsibilities? ",
+                        style: TextStyle(fontFamily: 'Poppins', fontSize: 14)),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -208,8 +247,11 @@ class _SignInPageState extends State<SignInPage> {
                       child: const Text(
                         "Create your account.",
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Colors.black,
                           decoration: TextDecoration.underline,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
                       ),
                     ),

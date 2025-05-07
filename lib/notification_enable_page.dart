@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/custom_button.dart';
 
 class NotificationEnablePage extends StatelessWidget {
   const NotificationEnablePage({Key? key}) : super(key: key);
@@ -10,6 +11,7 @@ class NotificationEnablePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -17,59 +19,57 @@ class NotificationEnablePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.notifications_none,
-                  size: 100,
-                  color: Colors.black,
+                Image.asset(
+                  'assets/images/notification_enable.png',
+                  width: 140,
+                  height: 140,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 24),
                 const Text(
                   "Enable Notifications",
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Poppins',
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  "Enable notifications for reminders and messages.",
+                  "Enable notifications for reminders and messages",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                    height: 1.4,
+                    fontSize: 15,
+                    color: Colors.black87,
+                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 40),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFB38E5D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    onPressed: () => _onEnableNotifications(context),
-                    child: const Text(
-                      "Enable",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
+                CustomButton(
+                  text: "Enable",
                   onPressed: () => _onEnableNotifications(context),
-                  child: const Text(
-                    "Skip for now",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                )
+                  backgroundColor: const Color(0xFFB38E5D),
+                  textColor: Colors.white,
+                  borderRadius: 30,
+                  height: 50,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  text: "Skip for now",
+                  onPressed: () => _onEnableNotifications(context),
+                  variant: CustomButtonVariant.outlined,
+                  borderColor: Colors.black,
+                  borderWidth: 2,
+                  borderRadius: 30,
+                  height: 50,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  textColor: Colors.black,
+                  backgroundColor: Colors.white,
+                ),
               ],
             ),
           ),

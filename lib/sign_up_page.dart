@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'verify_phone_page.dart';
+import 'widgets/custom_button.dart';
+import 'phone_number_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -15,10 +17,11 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
 
   String? _selectedGender;
+  bool _obscurePassword = true;
 
   // Date picker for Date of Birth
   Future<void> _selectDate(BuildContext context) async {
@@ -38,14 +41,17 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _onSignUpPressed() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Navigate to VerifyPhonePage, passing phone, first and last name
+      // Navigate to PhoneNumberPage, passing all collected data
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => VerifyPhonePage(
-            phoneNumber: _phoneController.text,
+          builder: (context) => PhoneNumberPage(
             firstName: _firstNameController.text,
             lastName: _lastNameController.text,
+            email: _emailController.text,
+            password: _passwordController.text,
+            dob: _dobController.text,
+            gender: _selectedGender,
           ),
         ),
       );
@@ -57,7 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
+    _passwordController.dispose();
     _dobController.dispose();
     super.dispose();
   }
@@ -65,51 +71,70 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.only(top: 112, left: 21),
-          width: 352,
+      backgroundColor: const Color(0xFFF7F7F7),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back arrow
                 IconButton(
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                 ),
-                const SizedBox(height: 20),
-                // Title
+                const SizedBox(height: 16),
                 const Text(
                   "Get on Board!",
                   style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Poppins',
                   ),
                 ),
-                const SizedBox(height: 20),
-                // Subtitle
+                const SizedBox(height: 4),
                 const Text(
                   "Create your profile and find your purrfect match",
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    fontSize: 18,
+                    color: Colors.black87,
+                    fontFamily: 'Poppins',
                   ),
                 ),
-                const SizedBox(height: 20),
-                // First & Last Name
+                const SizedBox(height: 28),
                 Row(
                   children: [
                     Expanded(
                       child: TextFormField(
                         controller: _firstNameController,
+                        style: const TextStyle(
+                            fontFamily: 'Poppins', fontSize: 16),
                         decoration: InputDecoration(
-                          labelText: "First Name",
+                          hintText: "First Name",
+                          hintStyle: const TextStyle(
+                              color: Colors.grey, fontFamily: 'Poppins'),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 14),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFB38E5D)),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFB38E5D)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFB38E5D), width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -119,15 +144,35 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: TextFormField(
                         controller: _lastNameController,
+                        style: const TextStyle(
+                            fontFamily: 'Poppins', fontSize: 16),
                         decoration: InputDecoration(
-                          labelText: "Last Name",
+                          hintText: "Last Name",
+                          hintStyle: const TextStyle(
+                              color: Colors.grey, fontFamily: 'Poppins'),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 14),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFB38E5D)),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFB38E5D)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFB38E5D), width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -139,15 +184,31 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                // Email
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: _emailController,
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: "Email Address",
+                    hintText: "Email Address",
+                    hintStyle: const TextStyle(
+                        color: Colors.grey, fontFamily: 'Poppins'),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFB38E5D), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -159,38 +220,82 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-                // Phone
+                const SizedBox(height: 12),
                 TextFormField(
-                  controller: _phoneController,
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: "Phone Number",
+                    hintText: "Password",
+                    hintStyle: const TextStyle(
+                        color: Colors.grey, fontFamily: 'Poppins'),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFB38E5D), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
                   ),
-                  keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Enter phone number';
+                      return 'Enter your password';
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-                // Date of Birth
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: _dobController,
                   readOnly: true,
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: "Date of Birth",
+                    hintText: "Date of Birth",
+                    hintStyle: const TextStyle(
+                        color: Colors.grey, fontFamily: 'Poppins'),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.calendar_today_outlined),
                       onPressed: () => _selectDate(context),
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFB38E5D), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -199,19 +304,40 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-                // Gender
+                const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
-                    labelText: "Gender",
+                    hintText: "Gender",
+                    hintStyle: const TextStyle(
+                        color: Colors.grey, fontFamily: 'Poppins'),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFB38E5D)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFB38E5D), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   value: _selectedGender,
                   items: const [
-                    DropdownMenuItem(value: 'Male', child: Text('Male')),
-                    DropdownMenuItem(value: 'Female', child: Text('Female')),
+                    DropdownMenuItem(
+                        value: 'Male',
+                        child: Text('Male',
+                            style: TextStyle(fontFamily: 'Poppins'))),
+                    DropdownMenuItem(
+                        value: 'Female',
+                        child: Text('Female',
+                            style: TextStyle(fontFamily: 'Poppins'))),
                   ],
                   onChanged: (String? newValue) {
                     setState(() {
@@ -225,73 +351,66 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-                // Sign Up Button
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: 18),
+                CustomButton(
+                  text: "Sign Up",
+                  onPressed: _onSignUpPressed,
+                  backgroundColor: const Color(0xFFB38E5D),
+                  textColor: Colors.white,
+                  borderRadius: 30,
                   height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFB38E5D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    onPressed: _onSignUpPressed,
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
                 ),
-                const SizedBox(height: 20),
-                // OR divider row
-                const Row(
+                const SizedBox(height: 14),
+                Row(
                   children: [
-                    Expanded(child: Divider(thickness: 1)),
+                    const Expanded(child: Divider(thickness: 2)),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text("OR"),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text("OR",
+                          style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54)),
                     ),
-                    Expanded(child: Divider(thickness: 1)),
+                    const Expanded(child: Divider(thickness: 2)),
                   ],
                 ),
-                const SizedBox(height: 20),
-                // Social Media Sign Up
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: 14),
+                CustomButton(
+                  text: "Sign up using social media",
+                  onPressed: () {},
+                  variant: CustomButtonVariant.outlined,
+                  borderColor: Colors.black,
+                  borderWidth: 2,
+                  borderRadius: 30,
                   height: 50,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    onPressed: () {
-                      // Handle social media sign up
-                    },
-                    child: const Text(
-                      "Sign up using social media",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  textColor: Colors.black,
+                  prefixIcon: const Icon(Icons.alternate_email,
+                      color: Colors.black, size: 24),
+                  backgroundColor: Colors.white,
                 ),
-                const SizedBox(height: 20),
-                // Already have an account? Log In
+                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Already have an account? "),
+                    const Text("Already have an account? ",
+                        style: TextStyle(fontFamily: 'Poppins', fontSize: 14)),
                     InkWell(
                       onTap: () {
-                        // Navigate to Sign In page
-                        // e.g. Navigator.pushNamed(context, '/signin');
+                        Navigator.pop(context);
                       },
                       child: const Text(
                         "Log In",
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Colors.black,
                           decoration: TextDecoration.underline,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
                       ),
                     ),

@@ -5,6 +5,7 @@ import 'community_page.dart';
 import 'matching_screen.dart';
 import 'discover_page.dart';
 import 'My_profilePage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LostAndFoundPage extends StatefulWidget {
   const LostAndFoundPage({super.key});
@@ -55,7 +56,7 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+     backgroundColor: Colors.white,
       extendBody: false,
       body: SafeArea(
         bottom: false,
@@ -67,8 +68,33 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
               pinned: true,
               floating: false,
               expandedHeight: 77,
-              flexibleSpace: const StickyHeader(
+              flexibleSpace: StickyHeader(
                 title: 'Lost & Found',
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/Bell_icon.svg',
+                        width: 24,
+                        height: 24,
+                      ),
+                      onPressed: () {
+                        // TODO: Navigate to notifications screen
+                      },
+                    ),
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/Chat_icon.svg',
+                        width: 24,
+                        height: 24,
+                      ),
+                      onPressed: () {
+                        // TODO: Navigate to chat screen
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             // ... rest of the code ...

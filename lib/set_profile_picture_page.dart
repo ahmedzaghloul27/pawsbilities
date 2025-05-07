@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'SetPetProfilePage.dart';
+import 'widgets/custom_button.dart';
 
 class SetProfilePicturePage extends StatefulWidget {
   final String firstName;
@@ -81,108 +82,103 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                onPressed: () => Navigator.of(context).pop(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
-
-              // Title
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  "Set your profile picture",
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+              const SizedBox(height: 16),
+              const Text(
+                "Set your profile\npicture",
+                style: TextStyle(
+                  fontSize: 33,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Poppins',
                 ),
+                maxLines: 2,
+                textAlign: TextAlign.start,
               ),
-              const SizedBox(height: 10),
-
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  "You must add at least one photo to create your profile.",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              Center(
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 80,
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!)
-                          : null,
-                      child: _profileImage == null
-                          ? const Icon(Icons.person,
-                              size: 80, color: Colors.white)
-                          : null,
-                    ),
-                    Positioned(
-                      right: 10,
-                      bottom: 10,
-                      child: GestureDetector(
-                        onTap: _showImageOptions,
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.brown[400],
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black, width: 4),
+                            ),
+                            child: CircleAvatar(
+                              radius: 100,
+                              backgroundColor: Colors.white,
+                              backgroundImage: _profileImage != null
+                                  ? FileImage(_profileImage!) as ImageProvider
+                                  : const AssetImage(
+                                      'assets/images/avatar.png'),
+                            ),
                           ),
-                          child: const Icon(Icons.add,
-                              color: Colors.white, size: 30),
-                        ),
+                          Positioned(
+                            right: 8,
+                            bottom: 8,
+                            child: GestureDetector(
+                              onTap: _showImageOptions,
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black,
+                                ),
+                                child: const Icon(Icons.add,
+                                    color: Colors.white, size: 26),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      Text(
+                        "${widget.firstName} ${widget.lastName}".toLowerCase(),
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Poppins',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
-
+              // Next button at bottom
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  "${widget.firstName} ${widget.lastName}",
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: CustomButton(
+                  text: "Next",
+                  onPressed: _onNextPressed,
+                  backgroundColor: const Color(0xFFB38E5D),
+                  textColor: Colors.white,
+                  borderRadius: 30,
+                  height: 50,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 20),
-
-              const SizedBox(height: 80),
             ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFB38E5D),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
-              ),
-            ),
-            onPressed: _onNextPressed,
-            child: const Text(
-              "Next",
-              style: TextStyle(fontSize: 18, color: Colors.white),
-            ),
           ),
         ),
       ),
