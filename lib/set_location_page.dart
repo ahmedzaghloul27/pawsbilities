@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SetLocationPage extends StatefulWidget {
   const SetLocationPage({super.key});
@@ -17,8 +18,8 @@ class _SetLocationPageState extends State<SetLocationPage> {
   GoogleMapController? _mapController;
   List<AutocompletePrediction> _predictions = [];
   String _selectedLocationName = 'Alexandria, Egypt';
+  bool _isLoading = false;
 
-  
   final String _googleApiKey = 'AIzaSyD4JvQ5V1FZHEAtCluWpb8l0y3o-PJS7K8';
   late GooglePlace _googlePlace;
 
@@ -29,6 +30,7 @@ class _SetLocationPageState extends State<SetLocationPage> {
   }
 
   void _onMapCreated(GoogleMapController controller) {
+    print('Map controller created');
     _mapController = controller;
   }
 
@@ -48,20 +50,119 @@ class _SetLocationPageState extends State<SetLocationPage> {
   }
 
   void _selectPrediction(AutocompletePrediction prediction) async {
-    final details = await _googlePlace.details.get(prediction.placeId!);
-    if (details != null &&
-        details.result != null &&
-        details.result!.geometry != null) {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      print('Fetching details for place: ${prediction.placeId}');
+      final details = await _googlePlace.details.get(prediction.placeId!);
+
+      if (details == null) {
+        throw Exception('Failed to get place details');
+      }
+
+      if (details.result == null) {
+        throw Exception('Place details result is null');
+      }
+
+      if (details.result!.geometry == null) {
+        throw Exception('Place geometry is null');
+      }
+
+      if (details.result!.geometry!.location == null) {
+        throw Exception('Place location is null');
+      }
+
       final lat = details.result!.geometry!.location!.lat;
       final lng = details.result!.geometry!.location!.lng;
+
+      if (lat == null || lng == null) {
+        throw Exception('Latitude or longitude is null');
+      }
+
+      print('Setting new position: lat=$lat, lng=$lng');
+      final newPosition = LatLng(lat, lng);
+
       setState(() {
-        _markerPosition = LatLng(lat!, lng!);
+        _markerPosition = newPosition;
         _selectedLocationName =
             details.result!.name ?? prediction.description ?? '';
         _searchController.text = _selectedLocationName;
         _predictions = [];
       });
-      _mapController?.animateCamera(CameraUpdate.newLatLng(_markerPosition));
+
+      if (_mapController != null) {
+        print('Animating camera to new position');
+        await _mapController!.animateCamera(
+          CameraUpdate.newLatLngZoom(newPosition, 15.0),
+        );
+      } else {
+        print('Map controller is null');
+      }
+    } catch (e) {
+      print('Error selecting prediction: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Check location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permission denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permission permanently denied');
+      }
+
+      // Get current position
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final newPosition = LatLng(position.latitude, position.longitude);
+
+      setState(() {
+        _markerPosition = newPosition;
+        _selectedLocationName = 'Current Location';
+        _searchController.text = _selectedLocationName;
+      });
+
+      if (_mapController != null) {
+        await _mapController!.animateCamera(
+          CameraUpdate.newLatLngZoom(newPosition, 15.0),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error getting location: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -76,6 +177,7 @@ class _SetLocationPageState extends State<SetLocationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
@@ -197,27 +299,43 @@ class _SetLocationPageState extends State<SetLocationPage> {
                       ),
                     },
                     myLocationButtonEnabled: false,
-                    myLocationEnabled: false,
+                    myLocationEnabled: true,
                   ),
                 ),
+                if (_isLoading)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 Positioned(
                   right: 24,
-                  bottom: 24,
-                  child: ElevatedButton(
-                    onPressed: _onDone,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FloatingActionButton(
+                        onPressed: _getCurrentLocation,
+                        backgroundColor: Colors.white,
+                        child:
+                            const Icon(Icons.my_location, color: Colors.black),
                       ),
-                      elevation: 2,
-                    ),
-                    child: const Text('Done',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _onDone,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: const Text('Done',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
                 ),
               ],

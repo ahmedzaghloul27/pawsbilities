@@ -9,6 +9,8 @@ import 'matches_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'Notifications.dart';
 import 'set_location_page.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_place/google_place.dart';
 
 // Dog data structure
 class Dog {
@@ -42,10 +44,41 @@ class _MatchingScreenState extends State<MatchingScreen> {
   // Currently selected dog
   late Dog _selectedDog;
 
+  String? _currentLocationName;
+
   @override
   void initState() {
     super.initState();
     _selectedDog = _dogs[0]; // Initialize with Leo
+    _getCurrentLocationName();
+  }
+
+  Future<void> _getCurrentLocationName() async {
+    try {
+      // Use geolocator to get current position
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      // Use GooglePlace to reverse geocode
+      final googlePlace =
+          GooglePlace('AIzaSyD4JvQ5V1FZHEAtCluWpb8l0y3o-PJS7K8');
+      final response = await googlePlace.search.getNearBySearch(
+        Location(lat: position.latitude, lng: position.longitude),
+        1,
+      );
+      String name = 'Current Location';
+      if (response != null &&
+          response.results != null &&
+          response.results!.isNotEmpty) {
+        name = response.results!.first.name ?? name;
+      }
+      setState(() {
+        _currentLocationName = name;
+      });
+    } catch (e) {
+      setState(() {
+        _currentLocationName = 'Current Location';
+      });
+    }
   }
 
   // Show dog selection dialog
@@ -250,27 +283,35 @@ class _MatchingScreenState extends State<MatchingScreen> {
                             Row(
                               children: [
                                 GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             const SetLocationPage(),
                                       ),
                                     );
+                                    if (result != null &&
+                                        result is Map &&
+                                        result['name'] != null) {
+                                      setState(() {
+                                        _currentLocationName = result['name'];
+                                      });
+                                    }
                                   },
                                   child: Row(
-                                    children: const [
+                                    children: [
                                       Text(
-                                        'Alexandria, Miami',
-                                        style: TextStyle(
+                                        _currentLocationName ??
+                                            'Detecting location...',
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.grey,
                                         ),
                                       ),
-                                      SizedBox(width: 2),
-                                      Icon(
+                                      const SizedBox(width: 2),
+                                      const Icon(
                                         Icons.keyboard_arrow_down_rounded,
                                         size: 18,
                                         color: Colors.grey,

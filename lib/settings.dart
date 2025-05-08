@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pawsbilities_app/welcome_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_place/google_place.dart';
+import 'set_location_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -800,46 +803,88 @@ class _MatchPreferencesBody extends StatefulWidget {
 
 class _MatchPreferencesBodyState extends State<_MatchPreferencesBody> {
   RangeValues _ageRange = const RangeValues(1, 16);
+  String? _currentLocationName;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocationName();
+  }
+
+  Future<void> _getCurrentLocationName() async {
+    try {
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      final googlePlace =
+          GooglePlace('AIzaSyD4JvQ5V1FZHEAtCluWpb8l0y3o-PJS7K8');
+      final response = await googlePlace.search.getNearBySearch(
+        Location(lat: position.latitude, lng: position.longitude),
+        1,
+      );
+      String name = 'Current Location';
+      if (response != null &&
+          response.results != null &&
+          response.results!.isNotEmpty) {
+        name = response.results!.first.name ?? name;
+      }
+      setState(() {
+        _currentLocationName = name;
+      });
+    } catch (e) {
+      setState(() {
+        _currentLocationName = 'Current Location';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildListDelegate([
-        const _SectionHeader('Location'),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text('Location', style: TextStyle(fontSize: 16)),
-            ),
-            DropdownButton<String>(
-              value: widget.location,
-              items: <String>[
-                'Alexandria, Montaza',
-                'Alexandria, Miami',
-                'Alexandria, Sedi-beshr',
-                'Alexandria, Mohamed-nagib',
-                'Alexandria, Louran',
-                'Alexandria, Gleem',
-                'Alexandria, Sedi-gaber',
-                'Alexandria, Smoha',
-                'Alexandria, Sporting',
-                'Alexandria, Manshia',
-                'Alexandria, Mahtet-raml',
-              ].map((String val) {
-                return DropdownMenuItem<String>(
-                  value: val,
-                  child: Text(val),
-                );
-              }).toList(),
-              onChanged: (val) {
-                if (val != null) widget.onLocationChanged(val);
-              },
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SetLocationPage(),
+                    ),
+                  );
+                  if (result != null &&
+                      result is Map &&
+                      result['name'] != null) {
+                    setState(() {
+                      _currentLocationName = result['name'];
+                    });
+                  }
+                },
+                child: Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.grey[700], size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      _currentLocationName ?? 'Detecting location...',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        const Divider(indent: 16, endIndent: 16, height: 4),
         const _SectionHeader('Preferred distance'),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
