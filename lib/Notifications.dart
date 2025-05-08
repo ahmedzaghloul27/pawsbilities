@@ -58,8 +58,18 @@ class Notifications_AppPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.arrow_back),
-        title: const Text('Notifications', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                color: Colors.black),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+        title: const Text('Notifications',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -71,12 +81,15 @@ class Notifications_AppPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = notifications[index];
           return Container(
-            color: item['highlight'] == true ? Colors.orange.shade50 : Colors.transparent,
+            color: item['highlight'] == true
+                ? Colors.orange.shade50
+                : Colors.transparent,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(item['icon'] as IconData, color: item['color'] as Color, size: 24),
+                Icon(item['icon'] as IconData,
+                    color: item['color'] as Color, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(

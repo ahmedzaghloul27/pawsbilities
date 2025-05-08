@@ -6,7 +6,7 @@ import 'matching_screen.dart';
 import 'discover_page.dart';
 import 'My_profilePage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'Notifications.dart';
 class LostAndFoundPage extends StatefulWidget {
   const LostAndFoundPage({super.key});
 
@@ -80,7 +80,12 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
                         height: 24,
                       ),
                       onPressed: () {
-                        // TODO: Navigate to notifications screen
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Notifications_AppPage(),
+                        ),
+                      );
                       },
                     ),
                     IconButton(

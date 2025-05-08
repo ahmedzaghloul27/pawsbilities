@@ -8,6 +8,7 @@ import 'discover_page.dart';
 import 'My_profilePage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'create_post_screen.dart';
+import 'Notifications.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -155,7 +156,12 @@ class _CommunityPageState extends State<CommunityPage> {
                         height: 24,
                       ),
                       onPressed: () {
-                        // TODO: Navigate to notifications screen
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Notifications_AppPage(),
+                        ),
+                      );
                       },
                     ),
                     IconButton(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'community_page.dart';
+import 'matching_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pawsibilities',
       theme: AppTheme.theme,
-      home: const CommunityPage(),
+      home: const MatchingScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

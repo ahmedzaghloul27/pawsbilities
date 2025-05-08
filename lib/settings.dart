@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pawsbilities_app/sign_in_page.dart';
 import 'package:pawsbilities_app/welcome_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

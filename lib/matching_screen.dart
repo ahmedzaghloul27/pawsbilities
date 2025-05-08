@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'widgets/custom_nav_bar.dart';
 import 'widgets/small_pet_card.dart';
 import 'My_profilePage.dart';
@@ -8,6 +7,8 @@ import 'lost_and_found_page.dart';
 import 'discover_page.dart';
 import 'matches_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'Notifications.dart';
+import 'set_location_page.dart';
 
 // Dog data structure
 class Dog {
@@ -247,20 +248,35 @@ class _MatchingScreenState extends State<MatchingScreen> {
                               ),
                             ),
                             Row(
-                              children: const [
-                                Text(
-                                  'Alexandria, Miami',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.grey,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SetLocationPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Row(
+                                    children: const [
+                                      Text(
+                                        'Alexandria, Miami',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      SizedBox(width: 2),
+                                      Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        size: 18,
+                                        color: Colors.grey,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(width: 2),
-                                Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  size: 18,
-                                  color: Colors.grey,
                                 ),
                               ],
                             ),
@@ -273,7 +289,15 @@ class _MatchingScreenState extends State<MatchingScreen> {
                           width: 24,
                           height: 24,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const Notifications_AppPage(),
+                            ),
+                          );
+                        },
                       ),
                       IconButton(
                         icon: SvgPicture.asset(
