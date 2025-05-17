@@ -71,13 +71,17 @@ class _MatchingScreenState extends State<MatchingScreen> {
           response.results!.isNotEmpty) {
         name = response.results!.first.name ?? name;
       }
-      setState(() {
-        _currentLocationName = name;
-      });
+      if (mounted) {
+        setState(() {
+          _currentLocationName = name;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _currentLocationName = 'Current Location';
-      });
+      if (mounted) {
+        setState(() {
+          _currentLocationName = 'Current Location';
+        });
+      }
     }
   }
 

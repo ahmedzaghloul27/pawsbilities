@@ -64,3 +64,19 @@ This project is for educational and demonstration purposes. For production use, 
 ---
 
 For more information, see the in-app Help Center or contact the development team.
+
+---
+
+## API Key Setup
+
+This app uses Google Maps and Google Place APIs. To set up the API keys:
+
+1. Copy `lib/api_keys.dart.template` to `lib/api_keys.dart`
+2. Replace the placeholder values with your actual API keys
+3. For Android:
+   - The API key is referenced from the `api_keys.dart` file
+   - Update `android/app/build.gradle` to read this value during build time
+4. For iOS:
+   - Update the API key in `ios/Runner/AppDelegate.swift` or `Info.plist`
+
+**NOTE:** The `api_keys.dart` file is listed in `.gitignore` to prevent accidentally committing your API keys to the repository.

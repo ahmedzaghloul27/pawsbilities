@@ -12,6 +12,7 @@ class SmallPetCard extends StatelessWidget {
   final double distance;
   final bool isFemale;
   final VoidCallback onTap;
+  final bool showGender;
 
   const SmallPetCard({
     super.key,
@@ -23,6 +24,7 @@ class SmallPetCard extends StatelessWidget {
     required this.distance,
     required this.isFemale,
     required this.onTap,
+    this.showGender = true,
   });
 
   void _showProfileOverlay(BuildContext context) {
@@ -92,10 +94,10 @@ class SmallPetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _showProfileOverlay(context),
+      onTap: onTap,
       child: Container(
         width: 140,
-        height: 138,
+        height: 180,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -152,12 +154,14 @@ class SmallPetCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          isFemale ? Icons.female : Icons.male,
-                          color: Colors.white,
-                          size: 16,
-                        ),
+                        if (showGender) ...[
+                          const SizedBox(width: 4),
+                          Icon(
+                            isFemale ? Icons.female : Icons.male,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 2),
