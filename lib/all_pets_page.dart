@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'widgets/small_pet_card.dart';
 import 'pet_post_detail_page.dart';
 
 class AllPetsPage extends StatelessWidget {
@@ -34,7 +33,7 @@ class AllPetsPage extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
-              '${section}\'s Ads',
+              '$section\'s Ads',
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,

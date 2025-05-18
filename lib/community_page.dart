@@ -9,6 +9,7 @@ import 'My_profilePage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'create_post_screen.dart';
 import 'Notifications.dart';
+import 'community_post_detail_page.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -157,11 +158,11 @@ class _CommunityPageState extends State<CommunityPage> {
                       ),
                       onPressed: () {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Notifications_AppPage(),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Notifications_AppPage(),
+                          ),
+                        );
                       },
                     ),
                     IconButton(
@@ -190,18 +191,119 @@ class _CommunityPageState extends State<CommunityPage> {
                     final post = posts[index - 1];
                     return Column(
                       children: [
-                        PostWidget(
-                          profileImageUrl: post['profileImageUrl'],
-                          userName: post['userName'],
-                          timeAgo: post['timeAgo'],
-                          content: post['content'],
-                          imageUrl: post['imageUrl'],
-                          likesCount: post['likesCount'],
-                          commentsCount: post['commentsCount'],
-                          onLikePressed: () {},
-                          onCommentPressed: () {},
-                          onSharePressed: () {},
-                          onMorePressed: () {},
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CommunityPostDetailPage(
+                                  userName: post['userName'],
+                                  timeAgo: post['timeAgo'],
+                                  content: post['content'],
+                                  imageUrl: post['imageUrl'],
+                                  likesCount: post['likesCount'],
+                                  commentsCount: post['commentsCount'],
+                                ),
+                              ),
+                            );
+                          },
+                          child: PostWidget(
+                            profileImageUrl: post['profileImageUrl'],
+                            userName: post['userName'],
+                            timeAgo: post['timeAgo'],
+                            content: post['content'],
+                            imageUrl: post['imageUrl'],
+                            likesCount: post['likesCount'],
+                            commentsCount: post['commentsCount'],
+                            onLikePressed: () {},
+                            onCommentPressed: () {},
+                            onSharePressed: () {},
+                            onMorePressed: () {
+                              // Show report dialog
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            'Report',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          const Text(
+                                            'Do you want to report this post?',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          const SizedBox(height: 24),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: const Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30),
+                                                  ),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 30,
+                                                    vertical: 12,
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content:
+                                                          Text('Post reported'),
+                                                      duration:
+                                                          Duration(seconds: 2),
+                                                    ),
+                                                  );
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text(
+                                                  'Report',
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         ),
                         if (index - 1 < posts.length - 1)
                           const SizedBox(height: 16),
