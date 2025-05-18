@@ -55,11 +55,6 @@ Pawsbilities is a modern Flutter application designed to help pet owners find su
   - `community_page.dart`, `lost_and_found_page.dart`, etc. - Other main screens
   - `widgets/` - Custom reusable widgets
 
-## Contributing
-Contributions are welcome! Please open issues or submit pull requests for improvements, bug fixes, or new features.
-
-## License
-This project is for educational and demonstration purposes. For production use, please ensure compliance with all third-party API terms and privacy requirements.
 
 ---
 
