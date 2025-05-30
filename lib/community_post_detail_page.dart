@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/small_pet_card.dart';
 
 class CommunityPostDetailPage extends StatefulWidget {
   final String userName;
@@ -396,6 +397,73 @@ class _CommunityPostDetailPageState extends State<CommunityPostDetailPage> {
                         ),
                       );
                     },
+                  ),
+
+                  // Related pets section
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 30, 16, 10),
+                    child: Text(
+                      'Pets you may like',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+
+                  // Grid of related pets
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 140 / 138,
+                      children: [
+                        SmallPetCard(
+                          imageUrl: 'assets/images/dog.png',
+                          name: 'Fluffy',
+                          breed: 'Shitzu',
+                          age: '3 years',
+                          weight: '6 kgs',
+                          distance: 7,
+                          isFemale: false,
+                          onTap: () {},
+                        ),
+                        SmallPetCard(
+                          imageUrl: 'assets/images/dog2.jpg',
+                          name: 'Shenko',
+                          breed: 'Husky',
+                          age: '1.5 years',
+                          weight: '22 kg',
+                          distance: 4.2,
+                          isFemale: false,
+                          onTap: () {},
+                        ),
+                        SmallPetCard(
+                          imageUrl: 'assets/images/dog3.jpg',
+                          name: 'Cinnamon',
+                          breed: 'Coonhound',
+                          age: '10 months',
+                          weight: '5 kg',
+                          distance: 2.8,
+                          isFemale: true,
+                          onTap: () {},
+                        ),
+                        SmallPetCard(
+                          imageUrl: 'assets/images/dog4.jpg',
+                          name: 'Milo',
+                          breed: 'Retriever',
+                          age: '3 years',
+                          weight: '32 kg',
+                          distance: 5.0,
+                          isFemale: false,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
                   ),
 
                   // Bottom spacing
