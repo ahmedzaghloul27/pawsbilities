@@ -10,6 +10,7 @@ import 'report_pet.dart';
 import 'widgets/small_pet_card.dart';
 import 'all_pets_page.dart';
 import 'pet_post_detail_page.dart';
+import 'chat_page.dart';
 
 class LostAndFoundPage extends StatefulWidget {
   const LostAndFoundPage({super.key});
@@ -75,7 +76,12 @@ class LostAndFoundHeader extends StatelessWidget
                           height: 24,
                         ),
                         onPressed: () {
-                          // TODO: Navigate to chat screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatPage(),
+                            ),
+                          );
                         },
                       ),
                     ],

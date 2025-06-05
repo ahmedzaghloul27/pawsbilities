@@ -3,12 +3,17 @@ import 'dart:ui'; // Add this import for ImageFilter
 import 'package:pawsbilities_app/matching_screen.dart';
 import 'widgets/custom_nav_bar.dart';
 import 'widgets/sticky_header.dart';
+import 'widgets/post_widget.dart';
+import 'widgets/dog_profile_card.dart';
 import 'settings.dart';
 import 'community_page.dart';
 import 'lost_and_found_page.dart';
 import 'discover_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flip_card/flip_card_controller.dart';
 import 'constants/colors.dart';
+import 'edit_profile_page.dart';
+import 'user_data.dart';
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -19,6 +24,35 @@ class MyProfilePage extends StatefulWidget {
 
 class _MyProfilePageState extends State<MyProfilePage> {
   int _selectedIndex = 4;
+  bool _isPetEditMode = false;
+  List<Map<String, dynamic>> _pets = [
+    {
+      'imageUrl': 'assets/images/dog.png',
+      'additionalImages': ['assets/images/dog2.jpg', 'assets/images/dog3.jpg'],
+      'name': 'Buddy',
+      'breed': 'Golden Retriever',
+      'age': '3 years',
+      'weight': '30 kg',
+      'distance': 3.5,
+      'isFemale': false,
+      'personality': 'Friendly, Energetic, Loyal',
+      'description':
+          'Buddy is a loving golden retriever who enjoys playing fetch and swimming. He\'s great with kids and other pets!',
+    },
+    {
+      'imageUrl': 'assets/images/dog2.jpg',
+      'additionalImages': ['assets/images/dog4.jpg'],
+      'name': 'Luna',
+      'breed': 'Border Collie',
+      'age': '2 years',
+      'weight': '22 kg',
+      'distance': 2.8,
+      'isFemale': true,
+      'personality': 'Intelligent, Active, Protective',
+      'description':
+          'Luna is a smart and agile border collie who loves to learn new tricks and go on adventures. Very protective of her family.',
+    },
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -54,6 +88,93 @@ class _MyProfilePageState extends State<MyProfilePage> {
         // Already on profile page
         break;
     }
+  }
+
+  Future<void> _navigateToEditProfile() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfilePage(
+          currentFirstName: UserData.firstName,
+          currentLastName: UserData.lastName,
+          currentEmail: UserData.email,
+          currentBio: UserData.bio,
+        ),
+      ),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        UserData.updateProfile(
+          firstName: result['firstName'],
+          lastName: result['lastName'],
+          bio: result['bio'],
+        );
+      });
+    }
+  }
+
+  void _showPetDetails(Map<String, dynamic> pet) {
+    final size = MediaQuery.of(context).size;
+    final cardWidth = size.width * 0.85;
+    final cardHeight = size.height * 0.7;
+    final controller = FlipCardController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async {
+            // Only allow pop if card is not flipped
+            if (controller.state?.isFront ?? true) {
+              return true;
+            } else {
+              controller.toggleCard();
+              return false;
+            }
+          },
+          child: GestureDetector(
+            onTap: () {
+              // Only close if card is not flipped
+              if (controller.state?.isFront ?? true) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Dialog(
+              insetPadding: EdgeInsets.zero,
+              backgroundColor: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {},
+                child: Center(
+                  child: SizedBox(
+                    width: cardWidth,
+                    height: cardHeight,
+                    child: DogProfileCard(
+                      imageUrl: pet['imageUrl'],
+                      name: pet['name'],
+                      breed: pet['breed'],
+                      age: pet['age'],
+                      weight: pet['weight'],
+                      distance: pet['distance'],
+                      ownerImageUrl: 'assets/images/Profile_pic.jpg',
+                      isOnline: true,
+                      isFemale: pet['isFemale'],
+                      onLike: () {},
+                      onChat: () {},
+                      onMore: () {
+                        controller.toggleCard();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -127,8 +248,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Mohammed Osama',
-                                style: TextStyle(
+                                UserData.fullName,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 22,
                                   fontFamily: 'Poppins',
@@ -176,8 +297,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                "I'm a software engineer and happy to be here on the app",
-                                style: TextStyle(
+                                UserData.bio,
+                                style: const TextStyle(
                                   fontSize: 15,
                                   fontFamily: 'Poppins',
                                 ),
@@ -194,7 +315,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: _navigateToEditProfile,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFB88C59),
                             shape: RoundedRectangleBorder(
@@ -216,43 +337,108 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     const SizedBox(height: 30),
 
                     // Pets
-                    const Text(
-                      'Pets',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Poppins',
-                        fontSize: 22,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Pets',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Poppins',
+                            fontSize: 22,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _isPetEditMode = !_isPetEditMode;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            color: AppColors.primary,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          ...[
-                            'https://images.unsplash.com/photo-1453487977089-77350a275ec5?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nJTIwYnJlZWRzfGVufDB8fDB8fHww',
-                            'https://www.princeton.edu/sites/default/files/styles/1x_full_2x_half_crop/public/images/2022/02/KOA_Nassau_2697x1517.jpg?itok=Bg2K7j7J',
-                            'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=1988&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                          ].map((url) {
+                          ..._pets.map((pet) {
                             return Padding(
                               padding: const EdgeInsets.only(right: 10),
-                              child: CircleAvatar(
-                                radius: 45,
-                                backgroundImage: NetworkImage(url),
+                              child: Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: _isPetEditMode
+                                        ? null
+                                        : () => _showPetDetails(pet),
+                                    child: Container(
+                                      width: 110,
+                                      height: 110,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: AppColors.primary, width: 3),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 42,
+                                        backgroundImage:
+                                            AssetImage(pet['imageUrl']),
+                                      ),
+                                    ),
+                                  ),
+                                  if (_isPetEditMode)
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _pets.remove(pet);
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 30,
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                blurRadius: 4,
+                                                offset: Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             );
                           }),
                           Container(
-                            width: 90,
-                            height: 90,
+                            width: 110,
+                            height: 110,
                             decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 237, 237, 237),
                               border: Border.all(
-                                  color: AppColors.primary, width: 2),
+                                  color: AppColors.primary, width: 3),
                               shape: BoxShape.circle,
                             ),
                             child: const Center(
-                              child: Icon(Icons.add,
-                                  color: AppColors.primary, size: 30),
+                              child: Icon(Icons.add_rounded,
+                                  color: AppColors.primary, size: 50),
                             ),
                           ),
                         ],
@@ -277,36 +463,35 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const PostCard(),
+                    PostWidget(
+                      profileImageUrl: 'assets/images/Profile_pic.jpg',
+                      userName: UserData.fullName,
+                      timeAgo: '11m',
+                      content:
+                          'My pup has been lonely up until now so we\'d love for him to make new friends and socialize❤️‼️',
+                      imageUrl: 'assets/images/dog.png',
+                      likesCount: 12,
+                      commentsCount: 1,
+                      onLikePressed: () {},
+                      onCommentPressed: () {},
+                      onSharePressed: () {},
+                      onMorePressed: () {},
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const PostCard(),
+                    PostWidget(
+                      profileImageUrl: 'assets/images/Profile_pic.jpg',
+                      userName: UserData.fullName,
+                      timeAgo: '2h',
+                      content:
+                          'Just completed our first training session! So proud of how well my pup did today 🎓🐕',
+                      imageUrl: 'assets/images/dog2.jpg',
+                      likesCount: 156,
+                      commentsCount: 42,
+                      onLikePressed: () {},
+                      onCommentPressed: () {},
+                      onSharePressed: () {},
+                      onMorePressed: () {},
                     ),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -317,121 +502,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
       bottomNavigationBar: CustomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
-      ),
-    );
-  }
-}
-
-class PostCard extends StatelessWidget {
-  const PostCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Post Header
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 20,
-                backgroundImage: AssetImage('assets/images/Profile_pic.jpg'),
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Ahmed Zaghloul',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  Text(
-                    '11m',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.more_horiz),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                onPressed: () {},
-              )
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Post Content
-          const Text(
-            'My pup has been lonely up until now so we\'d love for him to make new friends and socialize❤️‼️',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Post Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              'https://i.imgur.com/tGbaZCY.jpg',
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          // Post Actions
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Row(
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.favorite_border,
-                        size: 20, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      '12',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Row(
-                  children: [
-                    Icon(Icons.chat_bubble_outline,
-                        size: 20, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      '1',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Icon(Icons.share, size: 20, color: Colors.grey[600]),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

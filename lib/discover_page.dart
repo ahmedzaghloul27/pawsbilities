@@ -9,6 +9,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'Notifications.dart';
+import 'pet_post_detail_page.dart';
+import 'chat_page.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -251,7 +253,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
                       height: 24,
                     ),
                     onPressed: () {
-                      // TODO: Navigate to chat screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatPage(),
+                        ),
+                      );
                     },
                   ),
                 ],

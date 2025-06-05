@@ -11,6 +11,8 @@ import 'Notifications.dart';
 import 'set_location_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
+import 'dart:math' as math;
+import 'chat_page.dart';
 
 // Dog data structure
 class Dog {
@@ -27,11 +29,15 @@ class MatchingScreen extends StatefulWidget {
   State<MatchingScreen> createState() => _MatchingScreenState();
 }
 
-class _MatchingScreenState extends State<MatchingScreen> {
+class _MatchingScreenState extends State<MatchingScreen>
+    with TickerProviderStateMixin {
   int _selectedIndex = 2; // Matching screen is index 2 (paw button)
   final String userName = 'Ahmed'; // Variable for user name
   bool _isAdopting = false; // Toggle state for adopting button
   bool _isLikedProfilesTab = true; // Add this to track active tab
+
+  late AnimationController _flipController;
+  late Animation<double> _flipAnimation;
 
   // List of available dogs
   final List<Dog> _dogs = [
@@ -51,6 +57,25 @@ class _MatchingScreenState extends State<MatchingScreen> {
     super.initState();
     _selectedDog = _dogs[0]; // Initialize with Leo
     _getCurrentLocationName();
+
+    // Initialize flip animation
+    _flipController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _flipAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _flipController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _flipController.dispose();
+    super.dispose();
   }
 
   Future<void> _getCurrentLocationName() async {
@@ -350,7 +375,14 @@ class _MatchingScreenState extends State<MatchingScreen> {
                           width: 24,
                           height: 24,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatPage(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -371,7 +403,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Top picks for ${_selectedDog.name}',
+                          _isAdopting
+                              ? 'Top picks for you'
+                              : 'Top picks for ${_selectedDog.name}',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
@@ -383,6 +417,12 @@ class _MatchingScreenState extends State<MatchingScreen> {
                             setState(() {
                               _isAdopting = !_isAdopting;
                             });
+                            // Trigger flip animation
+                            if (_isAdopting) {
+                              _flipController.forward();
+                            } else {
+                              _flipController.reverse();
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -413,147 +453,58 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Exploring container
-                  Container(
-                    height: 460,
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.only(top: 8, bottom: 14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(29),
-                      border: Border.all(
-                        color: const Color(0xFFCBCBCB),
-                        width: 2,
-                      ),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFFFFE2B4),
-                          Color(0xFFEEC481),
-                        ],
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.09),
-                          offset: Offset(1, 4),
-                          blurRadius: 8.1,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Image container
-                        Container(
-                          height: 250,
-                          width: 250,
+                  // Exploring container with flip animation
+                  AnimatedBuilder(
+                    animation: _flipAnimation,
+                    builder: (context, child) {
+                      final isShowingFront = _flipAnimation.value < 0.5;
+                      return Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..setEntry(3, 2, 0.001)
+                          ..rotateY(_flipAnimation.value * math.pi),
+                        child: Container(
+                          height: 460,
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.only(top: 8, bottom: 14),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(29),
-                            image: const DecorationImage(
-                              image: AssetImage(
-                                  'assets/images/matchscreen_design.png'),
-                              fit: BoxFit.contain,
+                            border: Border.all(
+                              color: const Color(0xFFCBCBCB),
+                              width: 2,
                             ),
-                          ),
-                        ),
-                        // Exploring friends text
-                        const Text(
-                          'Exploring friends for:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        // Leo dropdown button
-                        GestureDetector(
-                          onTap: () => _showDogSelection(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: _isAdopting
+                                  ? [
+                                      const Color(0xFFFFB84D), // Orange
+                                      const Color(0xFFFF8C42), // Darker orange
+                                    ]
+                                  : [
+                                      const Color(0xFFFFE2B4), // Light yellow
+                                      const Color(0xFFEEC481), // Darker yellow
+                                    ],
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage:
-                                      AssetImage(_selectedDog.imageUrl),
-                                ),
-                                const SizedBox(width: 16),
-                                Text(
-                                  _selectedDog.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  size: 28,
-                                  color: Colors.black.withOpacity(0.6),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Start button
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MatchesPage(
-                                    selectedDogName: _selectedDog.name,
-                                    selectedDogImageUrl: _selectedDog.imageUrl,
-                                    isAdopting: _isAdopting,
-                                  ),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black87,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color.fromRGBO(0, 0, 0, 0.09),
+                                offset: Offset(1, 4),
+                                blurRadius: 8.1,
                               ),
-                              elevation: 0,
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Start',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(Icons.arrow_forward, size: 26),
-                              ],
-                            ),
+                            ],
                           ),
+                          child: isShowingFront
+                              ? _buildFrontContent()
+                              : Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.identity()
+                                    ..rotateY(math.pi),
+                                  child: _buildBackContent(),
+                                ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
 
                   // Discover section
@@ -762,5 +713,193 @@ class _MatchingScreenState extends State<MatchingScreen> {
         ),
       ];
     }
+  }
+
+  Widget _buildFrontContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Image container
+        Container(
+          height: 250,
+          width: 250,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(29),
+            image: const DecorationImage(
+              image: AssetImage('assets/images/matchscreen_design.png'),
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        // Exploring friends text
+        const Text(
+          'Exploring friends for:',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        // Leo dropdown button
+        GestureDetector(
+          onTap: () => _showDogSelection(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: AssetImage(_selectedDog.imageUrl),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  _selectedDog.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 28,
+                  color: Colors.black.withOpacity(0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Start button
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MatchesPage(
+                    selectedDogName: _selectedDog.name,
+                    selectedDogImageUrl: _selectedDog.imageUrl,
+                    isAdopting: _isAdopting,
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black87,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 0,
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Start',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward, size: 26),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Image container (same as front)
+        Container(
+          height: 250,
+          width: 250,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(29),
+            image: const DecorationImage(
+              image: AssetImage('assets/images/matchscreen_design.png'),
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        // Adoption text
+        const Text(
+          'You can\'t buy love, \n but you can adopt it',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        // Start button (same as front)
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MatchesPage(
+                    selectedDogName: _selectedDog.name,
+                    selectedDogImageUrl: _selectedDog.imageUrl,
+                    isAdopting: _isAdopting,
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black87,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 0,
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Start',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward, size: 26),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

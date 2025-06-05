@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'create_post_screen.dart';
 import 'Notifications.dart';
 import 'community_post_detail_page.dart';
+import 'chat_page.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -172,7 +173,12 @@ class _CommunityPageState extends State<CommunityPage> {
                         height: 24,
                       ),
                       onPressed: () {
-                        // TODO: Navigate to chat screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatPage(),
+                          ),
+                        );
                       },
                     ),
                   ],

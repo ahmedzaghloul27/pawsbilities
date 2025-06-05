@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'widgets/dog_profile_card.dart';
+import 'widgets/dog_profile_card_overlay.dart';
 import 'widgets/custom_button.dart';
+import 'chat_page.dart';
 
 class Dog {
   final String imageUrl;
+  final List<String> additionalImages;
   final String name;
   final String breed;
   final String age;
@@ -17,6 +19,7 @@ class Dog {
 
   Dog({
     required this.imageUrl,
+    this.additionalImages = const [],
     required this.name,
     required this.breed,
     required this.age,
@@ -52,6 +55,11 @@ class _MatchesPageState extends State<MatchesPage> {
   final List<Dog> _dogs = [
     Dog(
       imageUrl: 'assets/images/dog.png',
+      additionalImages: [
+        'assets/images/dog2.jpg',
+        'assets/images/dog3.jpg',
+        'assets/images/dog4.jpg'
+      ],
       name: 'Luna',
       breed: 'Golden Retriever',
       age: '2 years',
@@ -63,6 +71,7 @@ class _MatchesPageState extends State<MatchesPage> {
     ),
     Dog(
       imageUrl: 'assets/images/dog2.jpg',
+      additionalImages: ['assets/images/dog.png', 'assets/images/dog4.jpg'],
       name: 'Max',
       breed: 'Labrador',
       age: '1.5 years',
@@ -74,6 +83,7 @@ class _MatchesPageState extends State<MatchesPage> {
     ),
     Dog(
       imageUrl: 'assets/images/dog3.jpg',
+      additionalImages: ['assets/images/dog.png', 'assets/images/dog2.jpg'],
       name: 'Bella',
       breed: 'Poodle',
       age: '10 months',
@@ -85,6 +95,7 @@ class _MatchesPageState extends State<MatchesPage> {
     ),
     Dog(
       imageUrl: 'assets/images/dog4.jpg',
+      additionalImages: ['assets/images/dog2.jpg', 'assets/images/dog3.jpg'],
       name: 'Bondok',
       breed: 'German Shepherd',
       age: '3 years',
@@ -191,8 +202,9 @@ class _MatchesPageState extends State<MatchesPage> {
                           cardBuilder: (ctx, idx, hx, vx) {
                             return Transform.rotate(
                               angle: (hx * 0.04) * 0.0174533,
-                              child: DogProfileCard(
+                              child: DogProfileCardOverlay(
                                 imageUrl: _dogs[idx].imageUrl,
+                                additionalImages: _dogs[idx].additionalImages,
                                 name: _dogs[idx].name,
                                 breed: _dogs[idx].breed,
                                 age: _dogs[idx].age,
@@ -251,7 +263,14 @@ class _MatchesPageState extends State<MatchesPage> {
                   Positioned(
                     bottom: 10,
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatPage(),
+                          ),
+                        );
+                      },
                       child: Container(
                         width: 80,
                         height: 80,
