@@ -4,9 +4,15 @@ import 'theme/app_theme.dart';
 import 'matching_screen.dart';
 import 'services/mongo_service.dart';
 import 'services/auth_manager.dart';
+import 'config/secure_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize secure configuration
+  print('🔧 Initializing secure configuration...');
+  await SecureConfig.initialize();
+  SecureConfig.printConfigStatus();
 
   // Initialize MongoDB connection
   try {
@@ -14,6 +20,7 @@ void main() async {
     print('🚀 App started with MongoDB connection');
   } catch (e) {
     print('⚠️ App started without MongoDB connection: $e');
+    print('💡 Make sure your environment variables are set correctly');
   }
 
   runApp(const MyApp());

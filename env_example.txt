@@ -1,0 +1,16 @@
+# MongoDB Configuration
+# Copy this file to .env and fill in your actual values
+# DO NOT commit the .env file to git!
+
+MONGO_USER=your_mongodb_username
+MONGO_PASSWORD=your_new_mongodb_password
+MONGO_CLUSTER=adhamcluster.2zfyf.mongodb.net
+MONGO_DATABASE=pawsbilities
+
+# API Configuration
+API_BASE_URL=http://localhost:3000/api
+
+# Security Note:
+# 1. Never commit your .env file to git
+# 2. Add .env to your .gitignore file
+# 3. Use different credentials for development and production 

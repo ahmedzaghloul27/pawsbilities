@@ -42,5 +42,22 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# API Keys
+# API Keys and Sensitive Configuration
 lib/api_keys.dart
+.env
+.env.local
+.env.production
+.env.development
+config/secrets.dart
+lib/config/secrets.dart
+
+# Database credentials and connection strings
+**/database_credentials.dart
+**/mongo_credentials.dart
+
+# Security and secrets
+secrets/
+credentials/
+*.pem
+*.key
+*.cert

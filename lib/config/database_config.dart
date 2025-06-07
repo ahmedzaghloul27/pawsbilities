@@ -1,8 +1,9 @@
+import 'secure_config.dart';
+
 // MongoDB Configuration for Pawsbilities App
 class DatabaseConfig {
-  // MongoDB Atlas connection string
-  static const String mongoUri =
-      'mongodb+srv://adhamt79:N9eUSfzthq1gT7bG@adhamcluster.2zfyf.mongodb.net/pawsbilities';
+  // MongoDB Atlas connection string using secure configuration
+  static String get mongoUri => SecureConfig.getMongoUri();
 
   // Collection names (matching the backend structure)
   static const String usersCollection = 'users';
