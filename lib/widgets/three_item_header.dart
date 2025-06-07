@@ -52,7 +52,7 @@ class ThreeItemHeader extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'Poppins',
                     color: Colors.black,

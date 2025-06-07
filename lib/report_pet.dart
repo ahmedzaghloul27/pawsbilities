@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'widgets/three_item_header.dart';
 
 class ReportPet extends StatefulWidget {
   const ReportPet({Key? key}) : super(key: key);
@@ -106,93 +107,117 @@ class ReportPetState extends State<ReportPet> {
     final labelStyle = TextStyle(color: Colors.grey[600]);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: const BackButton(color: Colors.black),
-        title: const Text('Create Ad', style: TextStyle(color: Colors.black)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // TODO: Post ad logic
-            },
-            child: const Text('Post',
-                style: TextStyle(color: Colors.orange, fontSize: 18)),
-          )
-        ],
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ListView(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
           children: [
-            const SizedBox(height: 10),
-            const Text(
-              "Add up to 3 photos and at least one",
-              style: TextStyle(fontSize: 21),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Make sure to use real and clear photos and not catalogs.",
-              style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
-            ),
-            const SizedBox(height: 10),
-            _buildPhotoPicker(),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                _buildPostTypeButton("Lost", true),
-                const SizedBox(width: 10),
-                _buildPostTypeButton("Found", false),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: nameOrTitleController,
-              decoration: InputDecoration(
-                  labelText: isLost ? "Pet name" : "Title",
-                  labelStyle:
-                      const TextStyle(color: Colors.black, fontSize: 18)),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                  labelText: "Description",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: 17)),
-              maxLines: 3,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 18,
+            ThreeItemHeader(
+              title: 'Create Ad',
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_rounded,
+                    color: Colors.black),
+                onPressed: () => Navigator.pop(context),
               ),
-            ),
-            const SizedBox(height: 15),
-            DropdownButtonFormField<String>(
-              items: ["Park", "Street", "Home", "Vet"].map((location) {
-                return DropdownMenuItem(value: location, child: Text(location));
-              }).toList(),
-              onChanged: (value) {
-                locationController.text = value!;
-              },
-              decoration: InputDecoration(
-                labelText:
-                    isLost ? "Select last seen location" : "Select location",
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Checkbox(
-                  value: allowCalls,
-                  onChanged: (val) {
-                    setState(() {
-                      allowCalls = val!;
-                    });
-                  },
+              trailing: GestureDetector(
+                onTap: () {
+                  // TODO: Post ad logic
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: const Text(
+                    'Post',
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-                const Expanded(child: Text("Allow others to phone call you")),
-              ],
+              ),
             ),
-            const SizedBox(height: 20),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView(
+                  children: [
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Add up to 3 photos and at least one",
+                      style: TextStyle(fontSize: 21),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Make sure to use real and clear photos and not catalogs.",
+                      style:
+                          TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildPhotoPicker(),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        _buildPostTypeButton("Lost", true),
+                        const SizedBox(width: 10),
+                        _buildPostTypeButton("Found", false),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: nameOrTitleController,
+                      decoration: InputDecoration(
+                          labelText: isLost ? "Pet name" : "Title",
+                          labelStyle: const TextStyle(
+                              color: Colors.black, fontSize: 18)),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(
+                          labelText: "Description",
+                          labelStyle:
+                              TextStyle(color: Colors.black, fontSize: 17)),
+                      maxLines: 3,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    DropdownButtonFormField<String>(
+                      items: ["Park", "Street", "Home", "Vet"].map((location) {
+                        return DropdownMenuItem(
+                            value: location, child: Text(location));
+                      }).toList(),
+                      onChanged: (value) {
+                        locationController.text = value!;
+                      },
+                      decoration: InputDecoration(
+                        labelText: isLost
+                            ? "Select last seen location"
+                            : "Select location",
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: allowCalls,
+                          onChanged: (val) {
+                            setState(() {
+                              allowCalls = val!;
+                            });
+                          },
+                        ),
+                        const Expanded(
+                            child: Text("Allow others to phone call you")),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
