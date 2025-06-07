@@ -6,6 +6,7 @@ import 'lost_and_found_page.dart';
 import 'matching_screen.dart';
 import 'discover_page.dart';
 import 'My_profilePage.dart';
+import 'user_profile_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'create_post_screen.dart';
 import 'Notifications.dart';
@@ -27,6 +28,32 @@ class _CommunityPageState extends State<CommunityPage> {
       'profileImageUrl':
           'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
       'userName': 'Rich Froning',
+      'userLocation': 'Smouha, Alexandria',
+      'userBio':
+          'Fitness enthusiast and dog lover. Always looking for new adventures with my pup!',
+      'lastActive': 'Active now',
+      'isOnline': true,
+      'userPets': [
+        {
+          'imageUrl': 'assets/images/dog.png',
+          'name': 'Rex',
+          'breed': 'Golden Retriever',
+          'age': '3 years',
+          'weight': '30 kg',
+          'distance': 2.5,
+          'isFemale': false,
+        },
+      ],
+      'userPosts': [
+        {
+          'timeAgo': '11m',
+          'content':
+              'My pup has been lonely up until now so we\'d love for him to make new friends and socialize❤️‼️',
+          'imageUrl': 'assets/images/dog.png',
+          'likesCount': 12,
+          'commentsCount': 1,
+        },
+      ],
       'timeAgo': '11m',
       'content':
           'My pup has been lonely up until now so we\'d love for him to make new friends and socialize❤️‼️',
@@ -38,6 +65,32 @@ class _CommunityPageState extends State<CommunityPage> {
       'profileImageUrl':
           'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
       'userName': 'Megan Hunt',
+      'userLocation': 'Downtown, Alexandria',
+      'userBio':
+          'Professional photographer with a passion for capturing beautiful moments with pets.',
+      'lastActive': 'Last active 30 minutes ago',
+      'isOnline': false,
+      'userPets': [
+        {
+          'imageUrl': 'assets/images/dog2.jpg',
+          'name': 'Bella',
+          'breed': 'Labrador',
+          'age': '2 years',
+          'weight': '25 kg',
+          'distance': 1.8,
+          'isFemale': true,
+        },
+      ],
+      'userPosts': [
+        {
+          'timeAgo': '1h',
+          'content':
+              'I took this one a few days after i got her, I love it so much 🐾',
+          'imageUrl': 'assets/images/dog2.jpg',
+          'likesCount': 45,
+          'commentsCount': 8,
+        },
+      ],
       'timeAgo': '1h',
       'content':
           'I took this one a few days after i got her, I love it so much 🐾',
@@ -49,6 +102,32 @@ class _CommunityPageState extends State<CommunityPage> {
       'profileImageUrl':
           'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
       'userName': 'David Cooper',
+      'userLocation': 'Stanley, Alexandria',
+      'userBio':
+          'Engineer by day, dog trainer by weekend. Love spending time at the park!',
+      'lastActive': 'Last active 1 hour ago',
+      'isOnline': false,
+      'userPets': [
+        {
+          'imageUrl': 'assets/images/dog3.jpg',
+          'name': 'Max',
+          'breed': 'German Shepherd',
+          'age': '4 years',
+          'weight': '35 kg',
+          'distance': 3.2,
+          'isFemale': false,
+        },
+      ],
+      'userPosts': [
+        {
+          'timeAgo': '2h',
+          'content':
+              'First day at the park with Max! He\'s loving every minute of it 🐕🌳\nWho else takes their dog here?',
+          'imageUrl': 'assets/images/dog3.jpg',
+          'likesCount': 89,
+          'commentsCount': 15,
+        },
+      ],
       'timeAgo': '2h',
       'content':
           'First day at the park with Max! He\'s loving every minute of it 🐕🌳\nWho else takes their dog here?',
@@ -60,6 +139,32 @@ class _CommunityPageState extends State<CommunityPage> {
       'profileImageUrl':
           'https://images.unsplash.com/photo-1438761681033-6461ffad8d80',
       'userName': 'Sarah Wilson',
+      'userLocation': 'Kafr Abdo, Alexandria',
+      'userBio':
+          'Veterinarian and animal rights advocate. Always happy to help fellow pet owners!',
+      'lastActive': 'Last active 2 hours ago',
+      'isOnline': false,
+      'userPets': [
+        {
+          'imageUrl': 'assets/images/dog4.jpg',
+          'name': 'Luna',
+          'breed': 'Border Collie',
+          'age': '1 year',
+          'weight': '20 kg',
+          'distance': 4.1,
+          'isFemale': true,
+        },
+      ],
+      'userPosts': [
+        {
+          'timeAgo': '3h',
+          'content':
+              'Looking for playdate recommendations in Alexandria area! Luna is super friendly and loves making new friends 🐾💕',
+          'imageUrl': 'assets/images/dog4.jpg',
+          'likesCount': 67,
+          'commentsCount': 23,
+        },
+      ],
       'timeAgo': '3h',
       'content':
           'Looking for playdate recommendations in Alexandria area! Luna is super friendly and loves making new friends 🐾💕',
@@ -71,6 +176,32 @@ class _CommunityPageState extends State<CommunityPage> {
       'profileImageUrl':
           'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
       'userName': 'Mike Johnson',
+      'userLocation': 'Sidi Gaber, Alexandria',
+      'userBio':
+          'Software developer and dog training enthusiast. Love sharing tips and experiences!',
+      'lastActive': 'Last active 4 hours ago',
+      'isOnline': false,
+      'userPets': [
+        {
+          'imageUrl': 'assets/images/dog.png',
+          'name': 'Charlie',
+          'breed': 'Golden Retriever',
+          'age': '2 years',
+          'weight': '28 kg',
+          'distance': 5.0,
+          'isFemale': false,
+        },
+      ],
+      'userPosts': [
+        {
+          'timeAgo': '5h',
+          'content':
+              'Just completed our first training session! So proud of how well Charlie did today 🎓🐕\nAny training tips from experienced owners?',
+          'imageUrl': 'assets/images/dog.png',
+          'likesCount': 156,
+          'commentsCount': 42,
+        },
+      ],
       'timeAgo': '5h',
       'content':
           'Just completed our first training session! So proud of how well Charlie did today 🎓🐕\nAny training tips from experienced owners?',
@@ -129,6 +260,24 @@ class _CommunityPageState extends State<CommunityPage> {
         posts.insert(0, newPost);
       });
     }
+  }
+
+  void _navigateToUserProfile(Map<String, dynamic> userInfo) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserProfilePage(
+          userName: userInfo['userName'],
+          userLocation: userInfo['userLocation'],
+          userBio: userInfo['userBio'],
+          userImagePath: userInfo['profileImageUrl'],
+          lastActive: userInfo['lastActive'],
+          isOnline: userInfo['isOnline'],
+          userPets: List<Map<String, dynamic>>.from(userInfo['userPets']),
+          userPosts: List<Map<String, dynamic>>.from(userInfo['userPosts']),
+        ),
+      ),
+    );
   }
 
   @override
@@ -221,6 +370,7 @@ class _CommunityPageState extends State<CommunityPage> {
                             imageUrl: post['imageUrl'],
                             likesCount: post['likesCount'],
                             commentsCount: post['commentsCount'],
+                            onProfileTap: () => _navigateToUserProfile(post),
                             onLikePressed: () {},
                             onCommentPressed: () {},
                             onSharePressed: () {},

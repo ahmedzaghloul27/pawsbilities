@@ -136,11 +136,13 @@ class _IndividualChatPageState extends State<IndividualChatPage> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.location_on, color: Colors.grey),
+                  icon: const Icon(Icons.location_on_outlined,
+                      size: 28, color: Colors.grey),
                   onPressed: _sendLocation,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.camera_alt, color: Colors.grey),
+                  icon: const Icon(Icons.camera_alt_outlined,
+                      size: 28, color: Colors.grey),
                   onPressed: _pickAndSendImage,
                 ),
                 Expanded(
@@ -148,10 +150,10 @@ class _IndividualChatPageState extends State<IndividualChatPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: const Color.fromARGB(255, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(40),
                       border: Border.all(
                         color: Color.fromARGB(255, 196, 196, 196),
-                        width: 2,
+                        width: 2.5,
                       ),
                     ),
                     child: Row(
@@ -173,7 +175,7 @@ class _IndividualChatPageState extends State<IndividualChatPage> {
                             style: TextStyle(
                               color: Color.fromARGB(255, 255, 153, 0),
                               fontWeight: FontWeight.w600,
-                              fontSize: 16,
+                              fontSize: 17,
                             ),
                           ),
                         ),

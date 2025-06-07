@@ -9,6 +9,7 @@ class PostWidget extends StatelessWidget {
   final String imageUrl;
   final int likesCount;
   final int commentsCount;
+  final VoidCallback? onProfileTap;
   final VoidCallback? onLikePressed;
   final VoidCallback? onCommentPressed;
   final VoidCallback? onSharePressed;
@@ -23,6 +24,7 @@ class PostWidget extends StatelessWidget {
     required this.imageUrl,
     required this.likesCount,
     required this.commentsCount,
+    this.onProfileTap,
     this.onLikePressed,
     this.onCommentPressed,
     this.onSharePressed,
@@ -54,9 +56,12 @@ class PostWidget extends StatelessWidget {
               children: [
                 Column(
                   children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage(profileImageUrl),
+                    GestureDetector(
+                      onTap: onProfileTap,
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(profileImageUrl),
+                      ),
                     ),
                     const SizedBox(height: 18), // Space under avatar
                   ],
@@ -68,12 +73,15 @@ class PostWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            userName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              fontFamily: 'Poppins',
+                          GestureDetector(
+                            onTap: onProfileTap,
+                            child: Text(
+                              userName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),

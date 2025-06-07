@@ -152,35 +152,6 @@ class _DogProfileCardState extends State<DogProfileCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Distance indicator
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${widget.distance.toStringAsFixed(1)} km away',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
                       // Name and gender
                       Row(
                         children: [
@@ -233,53 +204,15 @@ class _DogProfileCardState extends State<DogProfileCard> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.favorite_outline),
-                      color: const Color(0xFFE94057),
-                      iconSize: 24,
-                      padding: EdgeInsets.zero,
-                      onPressed: widget.onLike,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.more_horiz),
-                      color: Colors.black,
-                      iconSize: 24,
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        _flipCardController.toggleCard();
-                        widget.onMore();
-                      },
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.more_horiz),
+                    color: Colors.white,
+                    iconSize: 28,
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      _flipCardController.toggleCard();
+                      widget.onMore();
+                    },
                   ),
                 ],
               ),

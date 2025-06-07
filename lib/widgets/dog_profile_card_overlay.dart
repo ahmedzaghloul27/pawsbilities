@@ -63,6 +63,7 @@ class _DogProfileCardOverlayState extends State<DogProfileCardOverlay> {
               child: Center(
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.8,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [

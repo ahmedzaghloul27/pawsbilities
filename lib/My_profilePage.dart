@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:ui'; // Add this import for ImageFilter
+import 'dart:io';
 import 'package:pawsbilities_app/matching_screen.dart';
 import 'widgets/custom_nav_bar.dart';
 import 'widgets/sticky_header.dart';
 import 'widgets/post_widget.dart';
-import 'widgets/dog_profile_card.dart';
+import 'widgets/my_pet_profile_card.dart';
 import 'settings.dart';
 import 'community_page.dart';
 import 'lost_and_found_page.dart';
@@ -109,6 +110,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           firstName: result['firstName'],
           lastName: result['lastName'],
           bio: result['bio'],
+          profileImage: result['profileImage'],
         );
       });
     }
@@ -237,8 +239,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             backgroundColor: Colors.white,
                             child: CircleAvatar(
                               radius: 51,
-                              backgroundImage: const AssetImage(
-                                  'assets/images/Profile_pic.jpg'),
+                              backgroundImage: UserData.profileImage != null
+                                  ? FileImage(UserData.profileImage!)
+                                  : const AssetImage(
+                                          'assets/images/Profile_pic.jpg')
+                                      as ImageProvider,
                             ),
                           ),
                         ),
@@ -464,7 +469,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     ),
                     const SizedBox(height: 16),
                     PostWidget(
-                      profileImageUrl: 'assets/images/Profile_pic.jpg',
+                      profileImageUrl: UserData.profileImage != null
+                          ? UserData.profileImage!.path
+                          : 'assets/images/Profile_pic.jpg',
                       userName: UserData.fullName,
                       timeAgo: '11m',
                       content:
@@ -479,7 +486,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     ),
                     const SizedBox(height: 16),
                     PostWidget(
-                      profileImageUrl: 'assets/images/Profile_pic.jpg',
+                      profileImageUrl: UserData.profileImage != null
+                          ? UserData.profileImage!.path
+                          : 'assets/images/Profile_pic.jpg',
                       userName: UserData.fullName,
                       timeAgo: '2h',
                       content:

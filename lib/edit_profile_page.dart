@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class EditProfilePage extends StatefulWidget {
   final String currentFirstName;
@@ -23,6 +25,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _bioController;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -42,12 +46,52 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Photo Library'),
+                onTap: () {
+                  _getImage(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  _getImage(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _getImage(ImageSource source) async {
+    final XFile? image = await _picker.pickImage(source: source);
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+      });
+    }
+  }
+
   void _saveProfile() {
     // Return the edited data back to the previous screen
     Navigator.pop(context, {
       'firstName': _firstNameController.text.trim(),
       'lastName': _lastNameController.text.trim(),
       'bio': _bioController.text.trim(),
+      'profileImage': _selectedImage,
     });
   }
 
@@ -109,30 +153,43 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                       ],
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: 56,
-                        backgroundImage:
-                            AssetImage('assets/images/Profile_pic.jpg'),
+                        backgroundImage: _selectedImage != null
+                            ? FileImage(_selectedImage!)
+                            : const AssetImage('assets/images/Profile_pic.jpg')
+                                as ImageProvider,
                       ),
                     ),
                   ),
                   Positioned(
                     right: 4,
                     bottom: 4,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFB88C59),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 20,
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.1),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt_outlined,
+                          color: Colors.black,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
