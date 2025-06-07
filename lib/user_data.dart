@@ -1,8 +1,8 @@
 import 'dart:io';
 
 class UserData {
-  static String _firstName = 'Mohammed';
-  static String _lastName = 'Osama';
+  static String _firstName = 'Ahmed';
+  static String _lastName = 'Zaghloul';
   static String _email = 'mohammed.osama@email.com';
   static String _bio =
       "I'm a software engineer and happy to be here on the app";
