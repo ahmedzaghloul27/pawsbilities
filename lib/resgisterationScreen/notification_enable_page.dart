@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'notification_enable_page.dart';
-import 'widgets/custom_button.dart';
+import '../widgets/custom_button.dart';
 
-class LocationEnablePage extends StatelessWidget {
-  const LocationEnablePage({Key? key}) : super(key: key);
+class NotificationEnablePage extends StatelessWidget {
+  const NotificationEnablePage({Key? key}) : super(key: key);
+
+  void _onEnableNotifications(BuildContext context) {
+    Navigator.popUntil(context, (route) => route.isFirst);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,14 +20,14 @@ class LocationEnablePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/images/location_enable.png',
+                  'assets/images/notification_enable.png',
                   width: 140,
                   height: 140,
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  "Enable location",
+                  "Enable Notifications",
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
@@ -34,7 +37,7 @@ class LocationEnablePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  "Enable your location will be used to find your purrfect match and discover new locations",
+                  "Enable notifications for reminders and messages",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -45,14 +48,7 @@ class LocationEnablePage extends StatelessWidget {
                 const SizedBox(height: 40),
                 CustomButton(
                   text: "Enable",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NotificationEnablePage(),
-                      ),
-                    );
-                  },
+                  onPressed: () => _onEnableNotifications(context),
                   backgroundColor: const Color(0xFFB38E5D),
                   textColor: Colors.white,
                   borderRadius: 30,
@@ -63,14 +59,7 @@ class LocationEnablePage extends StatelessWidget {
                 const SizedBox(height: 16),
                 CustomButton(
                   text: "Skip for now",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NotificationEnablePage(),
-                      ),
-                    );
-                  },
+                  onPressed: () => _onEnableNotifications(context),
                   variant: CustomButtonVariant.outlined,
                   borderColor: Colors.black,
                   borderWidth: 2,

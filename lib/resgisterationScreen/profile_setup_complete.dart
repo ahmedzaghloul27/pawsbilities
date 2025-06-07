@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'location_enable_page.dart';
-import 'widgets/custom_button.dart';
+import '../widgets/custom_button.dart';
 
 class ProfileSetupCompletePage extends StatelessWidget {
   final String? firstname;

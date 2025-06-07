@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'sign_up_page.dart';
 import 'sign_in_page.dart';
-import 'widgets/custom_button.dart';
+import '../widgets/custom_button.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);

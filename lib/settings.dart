@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pawsbilities_app/welcome_page.dart';
+import 'package:pawsbilities_app/resgisterationScreen/welcome_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pawsbilities_app/profile_setup_complete.dart';
-import 'widgets/custom_button.dart';
+import 'package:pawsbilities_app/resgisterationScreen/profile_setup_complete.dart';
+import '../widgets/custom_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 

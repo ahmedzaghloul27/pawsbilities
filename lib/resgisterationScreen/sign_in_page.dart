@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pawsbilities_app/sign_up_page.dart';
+import 'package:pawsbilities_app/resgisterationScreen/sign_up_page.dart';
 import 'forgot_password_page.dart';
 import 'profile_setup_complete.dart';
-import 'widgets/custom_button.dart';
+import '../widgets/custom_button.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'verify_phone_page.dart';
-import 'widgets/custom_button.dart';
+import '../widgets/custom_button.dart';
 
 class PhoneNumberPage extends StatefulWidget {
   final String firstName;

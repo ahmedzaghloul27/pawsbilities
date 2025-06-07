@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'SetPetProfilePage.dart';
-import 'widgets/custom_button.dart';
+import '../widgets/custom_button.dart';
 
 class SetProfilePicturePage extends StatefulWidget {
   final String firstName;
