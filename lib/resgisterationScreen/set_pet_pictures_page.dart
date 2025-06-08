@@ -1,38 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'set_pet_pictures_page.dart';
+import 'set_pet_details_page.dart';
 import '../widgets/custom_button.dart';
 
-class SetProfilePicturePage extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-
-  const SetProfilePicturePage({
-    super.key,
-    required this.firstName,
-    required this.lastName,
-  });
+class SetPetPicturesPage extends StatefulWidget {
+  const SetPetPicturesPage({super.key});
 
   @override
-  State<SetProfilePicturePage> createState() => _SetProfilePicturePageState();
+  State<SetPetPicturesPage> createState() => _SetPetPicturesPageState();
 }
 
-class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
-  File? _profileImage;
+class _SetPetPicturesPageState extends State<SetPetPicturesPage> {
+  final List<File?> _petImages = [null, null, null];
+  int _currentImageIndex = 0;
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
 
     if (pickedFile != null) {
       setState(() {
-        _profileImage = File(pickedFile.path);
+        _petImages[_currentImageIndex] = File(pickedFile.path);
       });
     }
     Navigator.pop(context);
   }
 
-  Future<void> _showImageOptions() async {
+  Future<void> _showImageOptions(int index) async {
+    _currentImageIndex = index;
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -49,13 +44,13 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
                 title: const Text('Choose from gallery'),
                 onTap: () => _pickImage(ImageSource.gallery),
               ),
-              if (_profileImage != null)
+              if (_petImages[index] != null)
                 ListTile(
                   leading: const Icon(Icons.delete),
                   title: const Text('Remove picture'),
                   onTap: () {
                     setState(() {
-                      _profileImage = null;
+                      _petImages[index] = null;
                     });
                     Navigator.pop(context);
                   },
@@ -75,7 +70,9 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
   void _onNextPressed() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SetPetPicturesPage()),
+      MaterialPageRoute(
+        builder: (context) => SetPetDetailsPage(petImages: _petImages),
+      ),
     );
   }
 
@@ -97,7 +94,7 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
               ),
               const SizedBox(height: 16),
               const Text(
-                "Set your profile\npicture",
+                "Set your pet\npictures",
                 style: TextStyle(
                   fontSize: 33,
                   fontWeight: FontWeight.w900,
@@ -106,6 +103,15 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
                 maxLines: 2,
                 textAlign: TextAlign.start,
               ),
+              const SizedBox(height: 8),
+              const Text(
+                'Add a main photo and 2 additional photos to showcase your pet.',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 15,
+                  fontFamily: 'Poppins',
+                ),
+              ),
               Expanded(
                 child: Center(
                   child: Column(
@@ -113,6 +119,7 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      // Main profile picture
                       Stack(
                         alignment: Alignment.bottomRight,
                         children: [
@@ -123,10 +130,10 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
                               border: Border.all(color: Colors.black, width: 4),
                             ),
                             child: CircleAvatar(
-                              radius: 100,
+                              radius: 80,
                               backgroundColor: Colors.white,
-                              backgroundImage: _profileImage != null
-                                  ? FileImage(_profileImage!) as ImageProvider
+                              backgroundImage: _petImages[0] != null
+                                  ? FileImage(_petImages[0]!) as ImageProvider
                                   : const AssetImage(
                                       'assets/images/avatar.png'),
                             ),
@@ -135,7 +142,7 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
                             right: 8,
                             bottom: 8,
                             child: GestureDetector(
-                              onTap: _showImageOptions,
+                              onTap: () => _showImageOptions(0),
                               child: Container(
                                 width: 38,
                                 height: 38,
@@ -150,15 +157,24 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
-                      Text(
-                        "${widget.firstName} ${widget.lastName}".toLowerCase(),
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Main Profile Picture",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
                           fontFamily: 'Poppins',
                         ),
                         textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      // Additional photos
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildAdditionalPhotoCircle(1),
+                          _buildAdditionalPhotoCircle(2),
+                        ],
                       ),
                     ],
                   ),
@@ -181,6 +197,47 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAdditionalPhotoCircle(int index) {
+    return GestureDetector(
+      onTap: () => _showImageOptions(index),
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black, width: 3),
+            ),
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.white,
+              backgroundImage: _petImages[index] != null
+                  ? FileImage(_petImages[index]!)
+                  : null,
+              child: _petImages[index] == null
+                  ? const Icon(Icons.camera_alt, color: Colors.grey, size: 32)
+                  : null,
+            ),
+          ),
+          Positioned(
+            right: 2,
+            bottom: 2,
+            child: Container(
+              width: 26,
+              height: 26,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black,
+              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 18),
+            ),
+          ),
+        ],
       ),
     );
   }
