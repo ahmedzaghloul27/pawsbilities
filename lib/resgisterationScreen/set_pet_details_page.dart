@@ -5,8 +5,13 @@ import '../widgets/custom_button.dart';
 
 class SetPetDetailsPage extends StatefulWidget {
   final List<File?> petImages;
+  final bool isFromProfile;
 
-  const SetPetDetailsPage({super.key, required this.petImages});
+  const SetPetDetailsPage({
+    super.key,
+    required this.petImages,
+    this.isFromProfile = false,
+  });
 
   @override
   State<SetPetDetailsPage> createState() => _SetPetDetailsPageState();
@@ -33,13 +38,32 @@ class _SetPetDetailsPageState extends State<SetPetDetailsPage> {
 
   void _onCompletePressed() {
     if (_formKey.currentState!.validate()) {
-      // Here you would typically save the pet data along with images
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ProfileSetupCompletePage(),
-        ),
-      );
+      if (widget.isFromProfile) {
+        // Return pet data to profile page - need to pop back to profile
+        Navigator.of(context).pop(); // Pop details page
+        Navigator.of(context).pop({
+          'mainImage': widget.petImages[0]?.path ?? 'assets/images/dog.png',
+          'additionalImages': widget.petImages
+              .skip(1)
+              .where((img) => img != null)
+              .map((img) => img!.path)
+              .toList(),
+          'name': _petNameController.text,
+          'breed': _breedController.text,
+          'age': _ageController.text,
+          'weight': _weightController.text,
+          'gender': _selectedGender,
+          'vaccinationStatus': _selectedVaccinationStatus,
+        });
+      } else {
+        // Continue to profile setup complete for registration flow
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ProfileSetupCompletePage(),
+          ),
+        );
+      }
     }
   }
 
@@ -62,26 +86,27 @@ class _SetPetDetailsPageState extends State<SetPetDetailsPage> {
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const ProfileSetupCompletePage(),
+                  if (!widget.isFromProfile)
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const ProfileSetupCompletePage(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Skip for now',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
                         ),
-                      );
-                    },
-                    child: const Text(
-                      'Skip for now',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
                       ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 10),

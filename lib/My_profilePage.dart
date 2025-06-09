@@ -15,6 +15,7 @@ import 'package:flip_card/flip_card_controller.dart';
 import 'constants/colors.dart';
 import 'edit_profile_page.dart';
 import 'user_data.dart';
+import 'resgisterationScreen/set_pet_pictures_page.dart';
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -112,6 +113,32 @@ class _MyProfilePageState extends State<MyProfilePage> {
           bio: result['bio'],
           profileImage: result['profileImage'],
         );
+      });
+    }
+  }
+
+  Future<void> _navigateToAddPet() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SetPetPicturesPage(isFromProfile: true),
+      ),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _pets.add({
+          'imageUrl': result['mainImage'],
+          'additionalImages': result['additionalImages'],
+          'name': result['name'],
+          'breed': result['breed'],
+          'age': result['age'],
+          'weight': result['weight'],
+          'distance': 0.0,
+          'isFemale': result['gender'] == 'Female',
+          'personality': 'Friendly, Playful',
+          'description': 'A lovely pet looking for friends!',
+        });
       });
     }
   }
@@ -432,18 +459,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               ),
                             );
                           }),
-                          Container(
-                            width: 110,
-                            height: 110,
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 237, 237, 237),
-                              border: Border.all(
-                                  color: AppColors.primary, width: 3),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(Icons.add_rounded,
-                                  color: AppColors.primary, size: 50),
+                          GestureDetector(
+                            onTap: _navigateToAddPet,
+                            child: Container(
+                              width: 110,
+                              height: 110,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 237, 237, 237),
+                                border: Border.all(
+                                    color: AppColors.primary, width: 3),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.add_rounded,
+                                    color: AppColors.primary, size: 50),
+                              ),
                             ),
                           ),
                         ],

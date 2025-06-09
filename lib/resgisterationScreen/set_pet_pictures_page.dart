@@ -5,7 +5,9 @@ import 'set_pet_details_page.dart';
 import '../widgets/custom_button.dart';
 
 class SetPetPicturesPage extends StatefulWidget {
-  const SetPetPicturesPage({super.key});
+  final bool isFromProfile;
+
+  const SetPetPicturesPage({super.key, this.isFromProfile = false});
 
   @override
   State<SetPetPicturesPage> createState() => _SetPetPicturesPageState();
@@ -71,7 +73,10 @@ class _SetPetPicturesPageState extends State<SetPetPicturesPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SetPetDetailsPage(petImages: _petImages),
+        builder: (context) => SetPetDetailsPage(
+          petImages: _petImages,
+          isFromProfile: widget.isFromProfile,
+        ),
       ),
     );
   }
