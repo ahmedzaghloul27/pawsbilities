@@ -23,7 +23,7 @@ MONGO_USER=adhamt79
 MONGO_PASSWORD=N9eUSfzthq1gT7bG
 MONGO_CLUSTER=adhamcluster.2zfyf.mongodb.net
 MONGO_DATABASE=pawsbilities
-API_BASE_URL=http://localhost:3000/api
+API_BASE_URL=http://localhost:5001/api
 ```
 
 ### 3. Verify Setup

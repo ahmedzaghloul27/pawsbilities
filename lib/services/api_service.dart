@@ -5,8 +5,18 @@ import '../models/user_model.dart';
 import '../models/pet_model.dart';
 
 class ApiService {
-  // Update this URL when you deploy your backend or run it locally
-  static const String baseUrl = 'http://localhost:3000/api';
+  // TODO: Replace this with your actual deployed backend URL
+  // For the Pawsibilities-db Final_Merging branch, deploy it and update this URL
+  static const String baseUrl =
+      'https://pawsibilities-backend-app.onrender.com/api'; // Replace with your deployed backend URL
+
+  // For local development, if you're running the backend locally, use:
+  // static const String baseUrl = 'http://localhost:3000/api';
+
+  // Alternative options (update as needed):
+  // static const String baseUrl = 'https://your-app-name.herokuapp.com/api';
+  // static const String baseUrl = 'https://your-app-name.vercel.app/api';
+  // static const String baseUrl = 'https://your-app-name.railway.app/api';
 
   // Headers for API requests
   static Map<String, String> get headers => {
@@ -46,7 +56,7 @@ class ApiService {
       if (response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        print('Registration failed: ${response.statusCode}');
+        print('Registration failed: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
@@ -72,7 +82,7 @@ class ApiService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        print('Login failed: ${response.statusCode}');
+        print('Login failed: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
@@ -118,10 +128,10 @@ class ApiService {
   }
 
   /// Pet Operations
-  static Future<List<Map<String, dynamic>>> getPets(String token) async {
+  static Future<List<Map<String, dynamic>>> getUserPets(String token) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/pets'),
+        Uri.parse('$baseUrl/pets/user'),
         headers: authHeaders(token),
       );
 
@@ -131,7 +141,26 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Get pets error: $e');
+      print('Get user pets error: $e');
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getAvailablePets(
+      String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/pets/available'),
+        headers: authHeaders(token),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['pets'] ?? []);
+      }
+      return [];
+    } catch (e) {
+      print('Get available pets error: $e');
       return [];
     }
   }
@@ -157,23 +186,17 @@ class ApiService {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getAvailablePetsForAdoption(
-    String token,
-  ) async {
+  static Future<bool> deletePet(String token, String petId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/pets/available'),
+      final response = await http.delete(
+        Uri.parse('$baseUrl/pets/$petId'),
         headers: authHeaders(token),
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['pets'] ?? []);
-      }
-      return [];
+      return response.statusCode == 200;
     } catch (e) {
-      print('Get available pets error: $e');
-      return [];
+      print('Delete pet error: $e');
+      return false;
     }
   }
 
@@ -181,7 +204,7 @@ class ApiService {
   static Future<bool> createMatch(
     String token,
     String petId,
-    String adopterId,
+    String targetPetId,
   ) async {
     try {
       final response = await http.post(
@@ -189,7 +212,7 @@ class ApiService {
         headers: authHeaders(token),
         body: jsonEncode({
           'petId': petId,
-          'adopterId': adopterId,
+          'targetPetId': targetPetId,
         }),
       );
 

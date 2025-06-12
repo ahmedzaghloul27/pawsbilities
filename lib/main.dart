@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'matching_screen.dart';
-import 'services/mongo_service.dart';
 import 'services/auth_manager.dart';
+import 'services/pet_provider.dart';
 import 'config/secure_config.dart';
+import 'resgisterationScreen/welcome_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,31 +15,91 @@ void main() async {
   await SecureConfig.initialize();
   SecureConfig.printConfigStatus();
 
-  // Initialize MongoDB connection
-  try {
-    await MongoService.connect();
-    print('🚀 App started with MongoDB connection');
-  } catch (e) {
-    print('⚠️ App started without MongoDB connection: $e');
-    print('💡 Make sure your environment variables are set correctly');
-  }
+  // Initialize AuthManager
+  final authManager = AuthManager();
+  await authManager.initialize();
 
-  runApp(const MyApp());
+  runApp(MyApp(authManager: authManager));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AuthManager authManager;
+
+  const MyApp({super.key, required this.authManager});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AuthManager(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authManager),
+        ChangeNotifierProvider(create: (context) => PetProvider()),
+      ],
       child: MaterialApp(
         title: 'Pawsibilities',
         theme: AppTheme.theme,
-        home: const MatchingScreen(),
+        home: const AuthWrapper(),
         debugShowCheckedModeBanner: false,
       ),
+    );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    // Load pets after authentication is confirmed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authManager = context.read<AuthManager>();
+      if (authManager.isAuthenticated) {
+        final petProvider = context.read<PetProvider>();
+        petProvider.refreshAllPets();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthManager>(
+      builder: (context, authManager, child) {
+        if (authManager.isLoading) {
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading...'),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (authManager.isAuthenticated) {
+          // Load pets when user is authenticated
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final petProvider = context.read<PetProvider>();
+            if (petProvider.userPets.isEmpty &&
+                petProvider.availablePets.isEmpty) {
+              petProvider.refreshAllPets();
+            }
+          });
+
+          return const MatchingScreen();
+        }
+
+        // Show welcome/login screen if not authenticated
+        return const WelcomePage(); // You'll need to create this or use your existing login screen
+      },
     );
   }
 }

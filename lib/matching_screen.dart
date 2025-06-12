@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'widgets/custom_nav_bar.dart';
 import 'widgets/small_pet_card.dart';
 import 'My_profilePage.dart';
@@ -13,14 +14,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
 import 'dart:math' as math;
 import 'chat_page.dart';
-
-// Dog data structure
-class Dog {
-  final String name;
-  final String imageUrl;
-
-  Dog({required this.name, required this.imageUrl});
-}
+import 'services/auth_manager.dart';
+import 'services/pet_provider.dart';
+import 'models/pet_model.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
@@ -32,30 +28,20 @@ class MatchingScreen extends StatefulWidget {
 class _MatchingScreenState extends State<MatchingScreen>
     with TickerProviderStateMixin {
   int _selectedIndex = 2; // Matching screen is index 2 (paw button)
-  final String userName = 'Ahmed'; // Variable for user name
   bool _isAdopting = false; // Toggle state for adopting button
   bool _isLikedProfilesTab = true; // Add this to track active tab
 
   late AnimationController _flipController;
   late Animation<double> _flipAnimation;
 
-  // List of available dogs
-  final List<Dog> _dogs = [
-    Dog(name: 'Leo', imageUrl: 'assets/images/dog.png'),
-    Dog(name: 'Max', imageUrl: 'assets/images/dog2.jpg'),
-    Dog(name: 'Fluffy', imageUrl: 'assets/images/dog3.jpg'),
-    Dog(name: 'Bondok', imageUrl: 'assets/images/dog4.jpg'),
-  ];
-
-  // Currently selected dog
-  late Dog _selectedDog;
+  // Selected pet from user's pets (for non-adopting mode)
+  Pet? _selectedUserPet;
 
   String? _currentLocationName;
 
   @override
   void initState() {
     super.initState();
-    _selectedDog = _dogs[0]; // Initialize with Leo
     _getCurrentLocationName();
 
     // Initialize flip animation
@@ -70,6 +56,26 @@ class _MatchingScreenState extends State<MatchingScreen>
       parent: _flipController,
       curve: Curves.easeInOut,
     ));
+
+    // Load data after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final petProvider = context.read<PetProvider>();
+      final authManager = context.read<AuthManager>();
+
+      if (authManager.isAuthenticated) {
+        // Load pets if not already loaded
+        if (petProvider.userPets.isEmpty && petProvider.availablePets.isEmpty) {
+          petProvider.refreshAllPets();
+        }
+
+        // Set default selected pet
+        if (petProvider.userPets.isNotEmpty && _selectedUserPet == null) {
+          setState(() {
+            _selectedUserPet = petProvider.userPets.first;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -110,8 +116,20 @@ class _MatchingScreenState extends State<MatchingScreen>
     }
   }
 
-  // Show dog selection dialog
-  void _showDogSelection(BuildContext context) {
+  // Show pet selection dialog
+  void _showPetSelection(BuildContext context) {
+    final petProvider = context.read<PetProvider>();
+
+    if (petProvider.userPets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You need to add a pet first!'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -127,7 +145,7 @@ class _MatchingScreenState extends State<MatchingScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'Select a Dog',
+                    'Select a Pet',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -135,7 +153,7 @@ class _MatchingScreenState extends State<MatchingScreen>
                   ),
                   const SizedBox(height: 16),
                   ...List.generate(
-                    _dogs.length,
+                    petProvider.userPets.length,
                     (index) => Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -150,7 +168,7 @@ class _MatchingScreenState extends State<MatchingScreen>
                         InkWell(
                           onTap: () {
                             setState(() {
-                              _selectedDog = _dogs[index];
+                              _selectedUserPet = petProvider.userPets[index];
                             });
                             Navigator.pop(context);
                           },
@@ -164,12 +182,17 @@ class _MatchingScreenState extends State<MatchingScreen>
                               children: [
                                 CircleAvatar(
                                   radius: 20,
-                                  backgroundImage:
-                                      AssetImage(_dogs[index].imageUrl),
+                                  backgroundImage: petProvider
+                                          .userPets[index].imageUrl
+                                          .startsWith('http')
+                                      ? NetworkImage(
+                                          petProvider.userPets[index].imageUrl)
+                                      : AssetImage(petProvider.userPets[index]
+                                          .imageUrl) as ImageProvider,
                                 ),
                                 const SizedBox(width: 16),
                                 Text(
-                                  _dogs[index].name,
+                                  petProvider.userPets[index].name,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
@@ -228,158 +251,296 @@ class _MatchingScreenState extends State<MatchingScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      extendBody: true,
-      body: SafeArea(
-        bottom: false,
-        child: CustomScrollView(
-          slivers: [
-            // Sticky Header
-            SliverAppBar(
-              pinned: true,
-              floating: false,
-              elevation: 0,
-              backgroundColor: Colors.white,
-              expandedHeight: 0,
-              toolbarHeight: 80,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                      spreadRadius: 0,
+    return Consumer2<AuthManager, PetProvider>(
+      builder: (context, authManager, petProvider, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          extendBody: true,
+          body: SafeArea(
+            bottom: false,
+            child: CustomScrollView(
+              slivers: [
+                // Sticky Header
+                SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  expandedHeight: 0,
+                  toolbarHeight: 80,
+                  flexibleSpace: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                          spreadRadius: 0,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color.fromRGBO(0, 0, 0, 0.1),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                              offset: Offset(0, 4),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 16.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: 23,
-                            backgroundImage: const AssetImage(
-                                'assets/images/Profile_pic.jpg'),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: 'Hi ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '$userName!',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                ],
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 23,
+                                backgroundImage:
+                                    authManager.currentUser?.profileImageUrl !=
+                                            null
+                                        ? NetworkImage(authManager
+                                            .currentUser!.profileImageUrl!)
+                                        : const AssetImage(
+                                                'assets/images/Profile_pic.jpg')
+                                            as ImageProvider,
                               ),
                             ),
-                            Row(
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                GestureDetector(
-                                  onTap: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SetLocationPage(),
-                                      ),
-                                    );
-                                    if (result != null &&
-                                        result is Map &&
-                                        result['name'] != null) {
-                                      setState(() {
-                                        _currentLocationName = result['name'];
-                                      });
-                                    }
-                                  },
-                                  child: Row(
+                                Text.rich(
+                                  TextSpan(
                                     children: [
-                                      Text(
-                                        _currentLocationName ??
-                                            'Detecting location...',
-                                        style: const TextStyle(
-                                          fontSize: 14,
+                                      const TextSpan(
+                                        text: 'Hi ',
+                                        style: TextStyle(
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w400,
-                                          color: Colors.grey,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
-                                      const Icon(
-                                        Icons.keyboard_arrow_down_rounded,
-                                        size: 18,
-                                        color: Colors.grey,
+                                      TextSpan(
+                                        text: '${authManager.userName}!',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SetLocationPage(),
+                                          ),
+                                        );
+                                        if (result != null &&
+                                            result is Map &&
+                                            result['name'] != null) {
+                                          setState(() {
+                                            _currentLocationName =
+                                                result['name'];
+                                          });
+                                        }
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            authManager.currentUser?.location ??
+                                                _currentLocationName ??
+                                                'Detecting location...',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 2),
+                                          const Icon(
+                                            Icons.keyboard_arrow_down_rounded,
+                                            size: 18,
+                                            color: Colors.grey,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/Bell_icon.svg',
+                              width: 24,
+                              height: 24,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const Notifications_AppPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/Chat_icon.svg',
+                              width: 24,
+                              height: 24,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChatPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Content
+                SliverToBoxAdapter(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 16),
+                      // Title and Adopting button row
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _isAdopting
+                                  ? 'Top picks for you'
+                                  : 'Top picks for ${_selectedUserPet?.name ?? 'your pet'}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black.withOpacity(0.8),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isAdopting = !_isAdopting;
+                                });
+                                // Trigger flip animation
+                                if (_isAdopting) {
+                                  _flipController.forward();
+                                } else {
+                                  _flipController.reverse();
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: _isAdopting
+                                      ? Colors.black
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: const Color.fromARGB(255, 9, 9, 9),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Adopting',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: _isAdopting
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/Bell_icon.svg',
-                          width: 24,
-                          height: 24,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const Notifications_AppPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/Chat_icon.svg',
-                          width: 24,
-                          height: 24,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ChatPage(),
+                      const SizedBox(height: 16),
+
+                      // Exploring container with flip animation
+                      AnimatedBuilder(
+                        animation: _flipAnimation,
+                        builder: (context, child) {
+                          final isShowingFront = _flipAnimation.value < 0.5;
+                          return Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..setEntry(3, 2, 0.001)
+                              ..rotateY(_flipAnimation.value * math.pi),
+                            child: Container(
+                              height: 460,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.only(top: 8, bottom: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(29),
+                                border: Border.all(
+                                  color: const Color(0xFFCBCBCB),
+                                  width: 2,
+                                ),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: _isAdopting
+                                      ? [
+                                          const Color(0xFFFFB84D), // Orange
+                                          const Color(
+                                              0xFFFF8C42), // Darker orange
+                                        ]
+                                      : [
+                                          const Color(
+                                              0xFFFFE2B4), // Light yellow
+                                          const Color(
+                                              0xFFEEC481), // Darker yellow
+                                        ],
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.09),
+                                    offset: Offset(1, 4),
+                                    blurRadius: 8.1,
+                                  ),
+                                ],
+                              ),
+                              child: isShowingFront
+                                  ? _buildFrontContent(petProvider)
+                                  : Transform(
+                                      alignment: Alignment.center,
+                                      transform: Matrix4.identity()
+                                        ..rotateY(math.pi),
+                                      child: _buildBackContent(petProvider),
+                                    ),
                             ),
                           );
                         },
@@ -387,519 +548,198 @@ class _MatchingScreenState extends State<MatchingScreen>
                     ],
                   ),
                 ),
+              ],
+            ),
+          ),
+          bottomNavigationBar: CustomNavBar(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFrontContent(PetProvider petProvider) {
+    // Display appropriate pets based on mode
+    final pets =
+        _isAdopting ? petProvider.availablePets : petProvider.availablePets;
+
+    if (petProvider.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (pets.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.pets,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _isAdopting
+                  ? 'No pets available for adoption'
+                  : 'No matches found',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
               ),
             ),
-
-            // Content
-            SliverToBoxAdapter(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 16),
-                  // Title and Adopting button row
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _isAdopting
-                              ? 'Top picks for you'
-                              : 'Top picks for ${_selectedDog.name}',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black.withOpacity(0.8),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isAdopting = !_isAdopting;
-                            });
-                            // Trigger flip animation
-                            if (_isAdopting) {
-                              _flipController.forward();
-                            } else {
-                              _flipController.reverse();
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: _isAdopting
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color.fromARGB(255, 9, 9, 9),
-                                width: 2,
-                              ),
-                            ),
-                            child: Text(
-                              'Adopting',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color:
-                                    _isAdopting ? Colors.white : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Exploring container with flip animation
-                  AnimatedBuilder(
-                    animation: _flipAnimation,
-                    builder: (context, child) {
-                      final isShowingFront = _flipAnimation.value < 0.5;
-                      return Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.001)
-                          ..rotateY(_flipAnimation.value * math.pi),
-                        child: Container(
-                          height: 460,
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          padding: const EdgeInsets.only(top: 8, bottom: 14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(29),
-                            border: Border.all(
-                              color: const Color(0xFFCBCBCB),
-                              width: 2,
-                            ),
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: _isAdopting
-                                  ? [
-                                      const Color(0xFFFFB84D), // Orange
-                                      const Color(0xFFFF8C42), // Darker orange
-                                    ]
-                                  : [
-                                      const Color(0xFFFFE2B4), // Light yellow
-                                      const Color(0xFFEEC481), // Darker yellow
-                                    ],
-                            ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color.fromRGBO(0, 0, 0, 0.09),
-                                offset: Offset(1, 4),
-                                blurRadius: 8.1,
-                              ),
-                            ],
-                          ),
-                          child: isShowingFront
-                              ? _buildFrontContent()
-                              : Transform(
-                                  alignment: Alignment.center,
-                                  transform: Matrix4.identity()
-                                    ..rotateY(math.pi),
-                                  child: _buildBackContent(),
-                                ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  // Discover section
-                  const SizedBox(height: 24),
-
-                  // Section header with tabs
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Discover',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black.withOpacity(0.8),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            _buildTab('Liked Profiles', _isLikedProfilesTab),
-                            const SizedBox(width: 24),
-                            _buildTab('Purrfect Match', !_isLikedProfilesTab),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Grid of pet cards
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 140 / 138,
-                      children: _buildPetCards(),
-                    ),
-                  ),
-                  const SizedBox(height: 100), // Bottom spacing for nav bar
-                ],
+            const SizedBox(height: 8),
+            Text(
+              'Check back later!',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
               ),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: CustomNavBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
-      ),
-    );
-  }
-
-  void _navigateToMatches(String dogName, String imageUrl) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MatchesPage(
-          selectedDogName: dogName,
-          selectedDogImageUrl: imageUrl,
-          isAdopting: _isAdopting,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTab(String text, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isLikedProfilesTab = text == 'Liked Profiles';
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? Colors.black : Colors.transparent,
-              width: 2,
-            ),
-          ),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.grey,
-            fontSize: 16,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildPetCards() {
-    if (_isLikedProfilesTab) {
-      return [
-        SmallPetCard(
-          imageUrl: 'assets/images/dog.png',
-          name: 'Fluffy',
-          breed: 'Shitzu',
-          age: '3 years',
-          weight: '6 kgs',
-          distance: 7,
-          isFemale: false,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog2.jpg',
-          name: 'Shenko',
-          breed: 'Husky',
-          age: '1.5 years',
-          weight: '22 kg',
-          distance: 4.2,
-          isFemale: false,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog3.jpg',
-          name: 'Cinnamon',
-          breed: 'Coonhound',
-          age: '10 months',
-          weight: '5 kg',
-          distance: 2.8,
-          isFemale: true,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog4.jpg',
-          name: 'Milo',
-          breed: 'Retriever',
-          age: '3 years',
-          weight: '32 kg',
-          distance: 5.0,
-          isFemale: false,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog4.jpg',
-          name: 'Kai',
-          breed: 'Cattle',
-          age: '2 years',
-          weight: '28 kg',
-          distance: 3.5,
-          isFemale: false,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog3.jpg',
-          name: 'Bondok',
-          breed: 'French Griffon',
-          age: '1 year',
-          weight: '15 kg',
-          distance: 6.0,
-          isFemale: false,
-          onTap: () {},
-        ),
-      ];
-    } else {
-      return [
-        SmallPetCard(
-          imageUrl: 'assets/images/dog2.jpg',
-          name: 'Rocky',
-          breed: 'German Shepherd',
-          age: '2 years',
-          weight: '30 kg',
-          distance: 3.2,
-          isFemale: false,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog3.jpg',
-          name: 'Luna',
-          breed: 'Labrador',
-          age: '1 year',
-          weight: '25 kg',
-          distance: 5.1,
-          isFemale: true,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog4.jpg',
-          name: 'Max',
-          breed: 'Golden Retriever',
-          age: '4 years',
-          weight: '28 kg',
-          distance: 2.5,
-          isFemale: false,
-          onTap: () {},
-        ),
-        SmallPetCard(
-          imageUrl: 'assets/images/dog.png',
-          name: 'Bella',
-          breed: 'Beagle',
-          age: '2.5 years',
-          weight: '12 kg',
-          distance: 4.8,
-          isFemale: true,
-          onTap: () {},
-        ),
-      ];
+      );
     }
+
+    // Show first available pet for simplicity
+    final pet = pets.first;
+
+    return _buildPetCard(pet);
   }
 
-  Widget _buildFrontContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Image container
-        Container(
-          height: 250,
-          width: 250,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(29),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/matchscreen_design.png'),
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        // Exploring friends text
-        const Text(
-          'Exploring friends for:',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
-        ),
-        // Leo dropdown button
-        GestureDetector(
-          onTap: () => _showDogSelection(context),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: AssetImage(_selectedDog.imageUrl),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  _selectedDog.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 28,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Start button
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MatchesPage(
-                    selectedDogName: _selectedDog.name,
-                    selectedDogImageUrl: _selectedDog.imageUrl,
-                    isAdopting: _isAdopting,
-                  ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black87,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              elevation: 0,
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Start',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward, size: 26),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+  Widget _buildBackContent(PetProvider petProvider) {
+    return _buildFrontContent(petProvider); // For now, same content
   }
 
-  Widget _buildBackContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Image container (same as front)
-        Container(
-          height: 250,
-          width: 250,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(29),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/matchscreen_design.png'),
-              fit: BoxFit.contain,
-            ),
+  Widget _buildPetCard(Pet pet) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
-        ),
-        // Adoption text
-        const Text(
-          'You can\'t buy love, \n but you can adopt it',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        // Start button (same as front)
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MatchesPage(
-                    selectedDogName: _selectedDog.name,
-                    selectedDogImageUrl: _selectedDog.imageUrl,
-                    isAdopting: _isAdopting,
-                  ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            // Pet image
+            Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: pet.imageUrl.startsWith('http')
+                      ? NetworkImage(pet.imageUrl)
+                      : AssetImage(pet.imageUrl) as ImageProvider,
+                  fit: BoxFit.cover,
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black87,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
               ),
-              elevation: 0,
             ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Start',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
+            // Gradient overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7),
+                  ],
+                  stops: const [0.6, 1.0],
+                ),
+              ),
+            ),
+            // Pet info
+            Positioned(
+              bottom: 20,
+              left: 20,
+              right: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    pet.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '${pet.breed} • ${pet.age}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  if (pet.description != null && pet.description!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        pet.description!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            // Selection button (if not in adopting mode)
+            if (!_isAdopting && _selectedUserPet != null)
+              Positioned(
+                top: 20,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => _showPetSelection(context),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundImage:
+                              _selectedUserPet!.imageUrl.startsWith('http')
+                                  ? NetworkImage(_selectedUserPet!.imageUrl)
+                                  : AssetImage(_selectedUserPet!.imageUrl)
+                                      as ImageProvider,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _selectedUserPet!.name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Icon(Icons.keyboard_arrow_down, size: 16),
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward, size: 26),
-              ],
-            ),
-          ),
+              ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
