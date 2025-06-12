@@ -28,6 +28,7 @@ class UserData {
     String? bio,
     String? location,
     File? profileImage,
+    String? profileImageUrl,
   }) async {
     final authManager = AuthManager();
 
@@ -47,6 +48,8 @@ class UserData {
     if (email != null) updateData['email'] = email;
     if (bio != null) updateData['bio'] = bio;
     if (location != null) updateData['location'] = location;
+    if (profileImageUrl != null)
+      updateData['profileImageUrl'] = profileImageUrl;
 
     // Update via AuthManager which handles API calls
     if (updateData.isNotEmpty) {

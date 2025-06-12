@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'set_pet_pictures_page.dart';
 import '../widgets/custom_button.dart';
+import 'package:pawsbilities_app/services/api_service.dart';
 
 class SetProfilePicturePage extends StatefulWidget {
   final String firstName;
@@ -72,10 +73,20 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
     );
   }
 
-  void _onNextPressed() {
+  void _onNextPressed() async {
+    String? photoUrl;
+    if (_profileImage != null) {
+      photoUrl = await ApiService.uploadImage(
+        _profileImage!,
+        folder: 'users_profile',
+      );
+    }
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SetPetPicturesPage()),
+      MaterialPageRoute(
+        builder: (context) => const SetPetPicturesPage(),
+      ),
     );
   }
 

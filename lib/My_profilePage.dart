@@ -109,7 +109,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
         firstName: result['firstName'],
         lastName: result['lastName'],
         bio: result['bio'],
-        profileImage: result['profileImage'],
+        profileImage: null,
+        profileImageUrl: result['profileImageUrl'],
       );
     }
   }

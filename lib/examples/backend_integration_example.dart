@@ -92,7 +92,7 @@ class _BackendIntegrationExampleState extends State<BackendIntegrationExample> {
           child: Row(
             children: [
               Text(
-                  'Welcome, ${authManager.currentUser?['firstName']} ${authManager.currentUser?['lastName']}!'),
+                  'Welcome, ${authManager.currentUser?.firstName ?? ''} ${authManager.currentUser?.lastName ?? ''}!'),
               Spacer(),
               ElevatedButton(
                 onPressed: () => authManager.logout(),
@@ -229,8 +229,7 @@ class _BackendIntegrationExampleState extends State<BackendIntegrationExample> {
 
     setState(() => _isLoading = true);
 
-    final pets =
-        await ApiService.getAvailablePetsForAdoption(authManager.token!);
+    final pets = await ApiService.getAvailablePets(authManager.token!);
 
     setState(() {
       _pets = pets;

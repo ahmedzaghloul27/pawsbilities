@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io';
+import 'package:pawsbilities_app/services/api_service.dart';
 
 enum MessageType { text, image, location }
 
@@ -216,9 +217,11 @@ class _IndividualChatPageState extends State<IndividualChatPage> {
       );
 
       if (image != null) {
+        final url = await ApiService.uploadImage(File(image.path),
+            folder: 'chat_images');
         setState(() {
           messages.add(ChatMessage(
-            text: image.path,
+            text: url ?? image.path,
             isMe: true,
             time:
                 '${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')} AM',
@@ -374,22 +377,28 @@ class ChatBubble extends StatelessWidget {
           ),
         );
       case MessageType.image:
+        final isUrl = message.text.startsWith('http');
         return ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.file(
-            File(message.text),
-            width: 200,
-            height: 200,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 200,
-                height: 100,
-                color: Colors.grey[300],
-                child: const Icon(Icons.error, color: Colors.red),
-              );
-            },
-          ),
+          child: isUrl
+              ? Image.network(
+                  message.text,
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 200,
+                    height: 100,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.error, color: Colors.red),
+                  ),
+                )
+              : Image.file(
+                  File(message.text),
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
         );
       case MessageType.location:
         final coordinates = message.text.split(',');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:pawsbilities_app/services/api_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String currentFirstName;
@@ -85,13 +86,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  void _saveProfile() {
-    // Return the edited data back to the previous screen
+  void _saveProfile() async {
+    String? photoUrl;
+    if (_selectedImage != null) {
+      photoUrl = await ApiService.uploadImage(
+        _selectedImage!,
+        folder: 'users_profile',
+      );
+    }
+
     Navigator.pop(context, {
       'firstName': _firstNameController.text.trim(),
       'lastName': _lastNameController.text.trim(),
       'bio': _bioController.text.trim(),
-      'profileImage': _selectedImage,
+      'profileImageUrl': photoUrl,
     });
   }
 

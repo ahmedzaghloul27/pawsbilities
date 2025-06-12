@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029869899195",
+    "project_id": "pawsibilities-7032c",
+    "storage_bucket": "pawsibilities-7032c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029869899195:android:62566d54e7d3bfbf18489e",
+        "android_client_info": {
+          "package_name": "com.example.pawsbilities_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc3opRAJAuYC421IQkAO9zM44aYQKdks4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

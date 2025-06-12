@@ -28,6 +28,12 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.2.2
   
+  # Add FlutterFire dependencies
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_storage: ^11.5.6
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../models/pet_model.dart';
+import '../services/storage_service.dart';
 
 class ApiService {
   // TODO: Replace this with your actual deployed backend URL
@@ -360,31 +361,12 @@ class ApiService {
     }
   }
 
-  /// File Upload
-  static Future<String?> uploadImage(String token, File imageFile) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$baseUrl/upload'),
-      );
-
-      request.headers.addAll(authHeaders(token));
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        imageFile.path,
-      ));
-
-      var response = await request.send();
-
-      if (response.statusCode == 200) {
-        var responseData = await response.stream.bytesToString();
-        var data = jsonDecode(responseData);
-        return data['imageUrl'];
-      }
-      return null;
-    } catch (e) {
-      print('Image upload error: $e');
-      return null;
-    }
+  /// Uploads an image file to Firebase Storage and returns its public URL.
+  /// If the upload fails `null` is returned.
+  static Future<String?> uploadImage(File imageFile,
+      {String folder = 'uploads'}) async {
+    final url =
+        await StorageService.uploadFile(file: imageFile, folder: folder);
+    return url;
   }
 }
