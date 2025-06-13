@@ -6,11 +6,27 @@ import '../widgets/custom_button.dart';
 class SetPetDetailsPage extends StatefulWidget {
   final List<File?> petImages;
   final bool isFromProfile;
+  final String? firstName;
+  final String? lastName;
+  final String? email;
+  final String? password;
+  final String? phone;
+  final String? dob;
+  final String? gender;
+  final String? profileImageUrl;
 
   const SetPetDetailsPage({
     super.key,
     required this.petImages,
     this.isFromProfile = false,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.password,
+    this.phone,
+    this.dob,
+    this.gender,
+    this.profileImageUrl,
   });
 
   @override
@@ -56,15 +72,41 @@ class _SetPetDetailsPageState extends State<SetPetDetailsPage> {
           'vaccinationStatus': _selectedVaccinationStatus,
         });
       } else {
-        // Continue to profile setup complete for registration flow
+        // Continue to profile setup complete for registration flow with all data
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const ProfileSetupCompletePage(),
+            builder: (context) => ProfileSetupCompletePage(
+              firstname: widget.firstName,
+              lastName: widget.lastName,
+              email: widget.email,
+              password: widget.password,
+              phone: widget.phone,
+              dob: widget.dob,
+              gender: widget.gender,
+            ),
           ),
         );
       }
     }
+  }
+
+  void _onSkipPressed() {
+    // Skip pet setup and go to profile complete with registration data
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfileSetupCompletePage(
+          firstname: widget.firstName,
+          lastName: widget.lastName,
+          email: widget.email,
+          password: widget.password,
+          phone: widget.phone,
+          dob: widget.dob,
+          gender: widget.gender,
+        ),
+      ),
+    );
   }
 
   @override
@@ -88,15 +130,7 @@ class _SetPetDetailsPageState extends State<SetPetDetailsPage> {
                   ),
                   if (!widget.isFromProfile)
                     TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const ProfileSetupCompletePage(),
-                          ),
-                        );
-                      },
+                      onPressed: _onSkipPressed,
                       child: const Text(
                         'Skip for now',
                         style: TextStyle(
@@ -349,4 +383,3 @@ class _CustomDropdownField extends StatelessWidget {
     );
   }
 }
-

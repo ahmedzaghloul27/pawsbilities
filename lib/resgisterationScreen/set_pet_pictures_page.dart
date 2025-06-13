@@ -6,8 +6,27 @@ import '../widgets/custom_button.dart';
 
 class SetPetPicturesPage extends StatefulWidget {
   final bool isFromProfile;
+  final String? firstName;
+  final String? lastName;
+  final String? email;
+  final String? password;
+  final String? phone;
+  final String? dob;
+  final String? gender;
+  final String? profileImageUrl;
 
-  const SetPetPicturesPage({super.key, this.isFromProfile = false});
+  const SetPetPicturesPage({
+    super.key,
+    this.isFromProfile = false,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.password,
+    this.phone,
+    this.dob,
+    this.gender,
+    this.profileImageUrl,
+  });
 
   @override
   State<SetPetPicturesPage> createState() => _SetPetPicturesPageState();
@@ -76,6 +95,14 @@ class _SetPetPicturesPageState extends State<SetPetPicturesPage> {
         builder: (context) => SetPetDetailsPage(
           petImages: _petImages,
           isFromProfile: widget.isFromProfile,
+          firstName: widget.firstName,
+          lastName: widget.lastName,
+          email: widget.email,
+          password: widget.password,
+          phone: widget.phone,
+          dob: widget.dob,
+          gender: widget.gender,
+          profileImageUrl: widget.profileImageUrl,
         ),
       ),
     );

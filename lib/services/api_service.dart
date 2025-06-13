@@ -31,6 +31,37 @@ class ApiService {
         'Authorization': 'Bearer $token',
       };
 
+  /// Wake up the backend service (for Render cold start issues)
+  static Future<bool> wakeUpBackend() async {
+    try {
+      print('🔥 Waking up backend service...');
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/health'), // Try health endpoint first
+            headers: headers,
+          )
+          .timeout(const Duration(seconds: 30));
+
+      print('🔥 Wake-up response: ${response.statusCode}');
+      return response.statusCode == 200;
+    } catch (e) {
+      print('🔥 Wake-up failed, trying basic ping...');
+      try {
+        // If health endpoint doesn't exist, try a basic endpoint
+        final response = await http
+            .get(
+              Uri.parse(baseUrl),
+              headers: headers,
+            )
+            .timeout(const Duration(seconds: 30));
+        return response.statusCode < 500; // Any response is good
+      } catch (e2) {
+        print('🔥 Wake-up completely failed: $e2');
+        return false;
+      }
+    }
+  }
+
   /// User Authentication
   static Future<Map<String, dynamic>?> register({
     required String firstName,
@@ -41,27 +72,48 @@ class ApiService {
     String? location,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
-        headers: headers,
-        body: jsonEncode({
-          'firstName': firstName,
-          'lastName': lastName,
-          'email': email,
-          'password': password,
-          'phone': phone,
-          'location': location,
-        }),
-      );
+      print('🔄 Starting registration request...');
+      print('📡 Backend URL: $baseUrl/auth/register');
+      print('👤 Data: firstName=$firstName, email=$email, phone=$phone');
+
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/register'),
+            headers: headers,
+            body: jsonEncode({
+              'firstName': firstName,
+              'lastName': lastName,
+              'email': email,
+              'password': password,
+              'phone': phone,
+              'location': location,
+            }),
+          )
+          .timeout(
+              const Duration(seconds: 60)); // Increased timeout for cold starts
+
+      print('📱 Response status: ${response.statusCode}');
+      print('📄 Response headers: ${response.headers}');
+      print('💬 Response body: ${response.body}');
 
       if (response.statusCode == 201) {
+        print('✅ Registration successful!');
         return jsonDecode(response.body);
       } else {
-        print('Registration failed: ${response.statusCode} - ${response.body}');
+        print(
+            '❌ Registration failed: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Registration error: $e');
+      print('💥 Registration error: $e');
+      if (e.toString().contains('TimeoutException')) {
+        print(
+            '⏰ Timeout error - Backend might be sleeping (Render cold start)');
+      } else if (e.toString().contains('SocketException')) {
+        print('🌐 Network error - Check internet connection');
+      } else if (e.toString().contains('FormatException')) {
+        print('📋 Data format error - Check request format');
+      }
       return null;
     }
   }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pawsbilities_app/resgisterationScreen/sign_up_page.dart';
 import 'forgot_password_page.dart';
-import 'profile_setup_complete.dart';
 import '../widgets/custom_button.dart';
+import '../services/auth_manager.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -17,6 +18,7 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailOrPhoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,13 +27,38 @@ class _SignInPageState extends State<SignInPage> {
     super.dispose();
   }
 
-  void _onLoginPressed() {
+  void _onLoginPressed() async {
     if (_formKey.currentState?.validate() ?? false) {
-      /* Navigator.push(
-        context,
-    MaterialPageRoute(
-            builder: (context) => const ProfileSetupCompletePage()),
-      ); */
+      setState(() {
+        _isLoading = true;
+      });
+
+      final authManager = context.read<AuthManager>();
+      final success = await authManager.login(
+        _emailOrPhoneController.text.trim(),
+        _passwordController.text,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (success) {
+        // Login successful - AuthWrapper will handle navigation to MatchingScreen
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      } else {
+        // Show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login failed. Please check your credentials.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -173,8 +200,9 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 const SizedBox(height: 18),
                 CustomButton(
-                  text: "Log in",
+                  text: _isLoading ? "Signing in..." : "Log in",
                   onPressed: _onLoginPressed,
+                  disabled: _isLoading,
                   backgroundColor: const Color(0xFFB38E5D),
                   textColor: Colors.white,
                   borderRadius: 30,

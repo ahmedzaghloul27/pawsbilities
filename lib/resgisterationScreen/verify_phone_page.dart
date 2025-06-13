@@ -6,12 +6,20 @@ class VerifyPhonePage extends StatefulWidget {
   final String phoneNumber;
   final String firstName;
   final String lastName;
+  final String email;
+  final String password;
+  final String? dob;
+  final String? gender;
 
   const VerifyPhonePage({
     Key? key,
     required this.phoneNumber,
     required this.firstName,
     required this.lastName,
+    required this.email,
+    required this.password,
+    this.dob,
+    this.gender,
   }) : super(key: key);
 
   @override
@@ -37,14 +45,12 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
 
   void _onNextPressed() {
     bool isComplete = true;
-    String code = '';
     for (var controller in _controllers) {
       final text = controller.text.trim();
       if (text.isEmpty || text.length != 1) {
         isComplete = false;
         break;
       }
-      code += text;
     }
     if (!isComplete) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,6 +65,11 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
         builder: (context) => SetProfilePicturePage(
           firstName: widget.firstName,
           lastName: widget.lastName,
+          email: widget.email,
+          password: widget.password,
+          phone: widget.phoneNumber,
+          dob: widget.dob,
+          gender: widget.gender,
         ),
       ),
     );

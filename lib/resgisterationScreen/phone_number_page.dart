@@ -55,6 +55,10 @@ class _PhoneNumberPageState extends State<PhoneNumberPage> {
             phoneNumber: fullPhone,
             firstName: widget.firstName,
             lastName: widget.lastName,
+            email: widget.email,
+            password: widget.password,
+            dob: widget.dob,
+            gender: widget.gender,
           ),
         ),
       );

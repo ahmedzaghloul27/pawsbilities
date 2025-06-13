@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'verify_phone_page.dart';
 import '../widgets/custom_button.dart';
 import 'phone_number_page.dart';
 

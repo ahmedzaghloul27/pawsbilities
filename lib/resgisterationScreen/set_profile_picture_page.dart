@@ -8,11 +8,21 @@ import 'package:pawsbilities_app/services/api_service.dart';
 class SetProfilePicturePage extends StatefulWidget {
   final String firstName;
   final String lastName;
+  final String email;
+  final String password;
+  final String? phone;
+  final String? dob;
+  final String? gender;
 
   const SetProfilePicturePage({
     super.key,
     required this.firstName,
     required this.lastName,
+    required this.email,
+    required this.password,
+    this.phone,
+    this.dob,
+    this.gender,
   });
 
   @override
@@ -85,7 +95,16 @@ class _SetProfilePicturePageState extends State<SetProfilePicturePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SetPetPicturesPage(),
+        builder: (context) => SetPetPicturesPage(
+          firstName: widget.firstName,
+          lastName: widget.lastName,
+          email: widget.email,
+          password: widget.password,
+          phone: widget.phone,
+          dob: widget.dob,
+          gender: widget.gender,
+          profileImageUrl: photoUrl,
+        ),
       ),
     );
   }
