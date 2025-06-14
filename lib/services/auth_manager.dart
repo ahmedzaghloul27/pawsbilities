@@ -82,7 +82,7 @@ class AuthManager extends ChangeNotifier {
     required String email,
     required String password,
     String? phone,
-    String? location,
+    String? address,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -94,7 +94,7 @@ class AuthManager extends ChangeNotifier {
         email: email,
         password: password,
         phone: phone,
-        location: location,
+        address: address,
       );
 
       if (response != null && response['token'] != null) {

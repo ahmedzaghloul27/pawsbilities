@@ -1,83 +1,73 @@
-import 'package:mongo_dart/mongo_dart.dart';
-
 class User {
-  final String? id;
+  final String id;
   final String firstName;
   final String lastName;
   final String email;
+  final String? phone;
   final String? bio;
-  final String? profileImageUrl;
   final String? location;
-  final bool isOnline;
-  final DateTime? lastActive;
-  final List<String> petIds;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? profileImageUrl;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   User({
-    this.id,
+    required this.id,
     required this.firstName,
     required this.lastName,
     required this.email,
+    this.phone,
     this.bio,
-    this.profileImageUrl,
     this.location,
-    this.isOnline = false,
-    this.lastActive,
-    this.petIds = const [],
-    required this.createdAt,
-    required this.updatedAt,
+    this.profileImageUrl,
+    this.createdAt,
+    this.updatedAt,
   });
 
-  // Convert from MongoDB document
+  String get fullName => '$firstName $lastName';
+
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['_id']?.toString(),
+      id: map['_id']?.toString() ?? map['id']?.toString() ?? '',
       firstName: map['firstName'] ?? '',
       lastName: map['lastName'] ?? '',
       email: map['email'] ?? '',
+      phone: map['phone'],
       bio: map['bio'],
-      profileImageUrl: map['profileImageUrl'],
       location: map['location'],
-      isOnline: map['isOnline'] ?? false,
-      lastActive: map['lastActive']?.toDate(),
-      petIds: List<String>.from(map['petIds'] ?? []),
-      createdAt: map['createdAt']?.toDate() ?? DateTime.now(),
-      updatedAt: map['updatedAt']?.toDate() ?? DateTime.now(),
+      profileImageUrl: map['profileImageUrl'],
+      createdAt: map['createdAt'] != null
+          ? DateTime.tryParse(map['createdAt'].toString())
+          : null,
+      updatedAt: map['updatedAt'] != null
+          ? DateTime.tryParse(map['updatedAt'].toString())
+          : null,
     );
   }
 
-  // Convert to MongoDB document
   Map<String, dynamic> toMap() {
     return {
-      if (id != null) '_id': ObjectId.parse(id!),
+      'id': id,
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
+      'phone': phone,
       'bio': bio,
-      'profileImageUrl': profileImageUrl,
       'location': location,
-      'isOnline': isOnline,
-      'lastActive': lastActive,
-      'petIds': petIds,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'profileImageUrl': profileImageUrl,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
-
-  String get fullName => '$firstName $lastName';
 
   User copyWith({
     String? id,
     String? firstName,
     String? lastName,
     String? email,
+    String? phone,
     String? bio,
-    String? profileImageUrl,
     String? location,
-    bool? isOnline,
-    DateTime? lastActive,
-    List<String>? petIds,
+    String? profileImageUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -86,12 +76,10 @@ class User {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
+      phone: phone ?? this.phone,
       bio: bio ?? this.bio,
-      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       location: location ?? this.location,
-      isOnline: isOnline ?? this.isOnline,
-      lastActive: lastActive ?? this.lastActive,
-      petIds: petIds ?? this.petIds,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

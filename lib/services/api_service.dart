@@ -4,421 +4,292 @@ import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../models/pet_model.dart';
 import '../services/storage_service.dart';
+import '../config/secure_config.dart';
 
+/// Centralized API service for Pawsibilities Flutter app
 class ApiService {
-  // TODO: Replace this with your actual deployed backend URL
-  // For the Pawsibilities-db Final_Merging branch, deploy it and update this URL
-  static const String baseUrl =
-      'https://pawsibilities-backend-app.onrender.com/api'; // Replace with your deployed backend URL
+  /// Base URL loaded from SecureConfig (.env or default)
+  static String get baseUrl => SecureConfig.getApiBaseUrl();
 
-  // For local development, if you're running the backend locally, use:
-  // static const String baseUrl = 'http://localhost:3000/api';
-
-  // Alternative options (update as needed):
-  // static const String baseUrl = 'https://your-app-name.herokuapp.com/api';
-  // static const String baseUrl = 'https://your-app-name.vercel.app/api';
-  // static const String baseUrl = 'https://your-app-name.railway.app/api';
-
-  // Headers for API requests
+  /// Common headers
   static Map<String, String> get headers => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
 
-  // Auth headers with token
+  /// Authenticated headers
   static Map<String, String> authHeaders(String token) => {
         ...headers,
         'Authorization': 'Bearer $token',
       };
 
-  /// Wake up the backend service (for Render cold start issues)
+  /// Try waking up the backend (handles Render cold starts)
   static Future<bool> wakeUpBackend() async {
     try {
-      print('🔥 Waking up backend service...');
       final response = await http
-          .get(
-            Uri.parse('$baseUrl/health'), // Try health endpoint first
-            headers: headers,
-          )
+          .get(Uri.parse(baseUrl), headers: headers)
           .timeout(const Duration(seconds: 30));
-
-      print('🔥 Wake-up response: ${response.statusCode}');
-      return response.statusCode == 200;
-    } catch (e) {
-      print('🔥 Wake-up failed, trying basic ping...');
-      try {
-        // If health endpoint doesn't exist, try a basic endpoint
-        final response = await http
-            .get(
-              Uri.parse(baseUrl),
-              headers: headers,
-            )
-            .timeout(const Duration(seconds: 30));
-        return response.statusCode < 500; // Any response is good
-      } catch (e2) {
-        print('🔥 Wake-up completely failed: $e2');
-        return false;
-      }
+      return response.statusCode < 500;
+    } catch (_) {
+      return false;
     }
   }
 
-  /// User Authentication
+  // ── AUTH ───────────────────────────────────────────────────────────────
+
+  /// Register a new user
   static Future<Map<String, dynamic>?> register({
     required String firstName,
     required String lastName,
     required String email,
     required String password,
     String? phone,
-    String? location,
+    String? userName,
+    String? gender,
+    String? address,
   }) async {
-    try {
-      print('🔄 Starting registration request...');
-      print('📡 Backend URL: $baseUrl/auth/register');
-      print('👤 Data: firstName=$firstName, email=$email, phone=$phone');
+    final url = '$baseUrl/users/register';
+    final body = jsonEncode({
+      'firstName': firstName,
+      'lastName': lastName,
+      'userName':
+          userName ?? '${firstName.toLowerCase()}${lastName.toLowerCase()}',
+      'gender': gender ?? 'prefer_not_to_say',
+      'address': address ?? '',
+      'phone': phone ?? '',
+      'email': email,
+      'password': password,
+    });
 
-      final response = await http
+    try {
+      final res = await http
           .post(
-            Uri.parse('$baseUrl/auth/register'),
+            Uri.parse(url),
             headers: headers,
-            body: jsonEncode({
-              'firstName': firstName,
-              'lastName': lastName,
-              'email': email,
-              'password': password,
-              'phone': phone,
-              'location': location,
-            }),
+            body: body,
           )
-          .timeout(
-              const Duration(seconds: 60)); // Increased timeout for cold starts
+          .timeout(const Duration(seconds: 30));
 
-      print('📱 Response status: ${response.statusCode}');
-      print('📄 Response headers: ${response.headers}');
-      print('💬 Response body: ${response.body}');
-
-      if (response.statusCode == 201) {
-        print('✅ Registration successful!');
-        return jsonDecode(response.body);
-      } else {
-        print(
-            '❌ Registration failed: ${response.statusCode} - ${response.body}');
-        return null;
+      if (res.statusCode == 201) {
+        return jsonDecode(res.body);
       }
+      print('Register error: ${res.statusCode} ${res.body}');
+      return null;
     } catch (e) {
-      print('💥 Registration error: $e');
-      if (e.toString().contains('TimeoutException')) {
-        print(
-            '⏰ Timeout error - Backend might be sleeping (Render cold start)');
-      } else if (e.toString().contains('SocketException')) {
-        print('🌐 Network error - Check internet connection');
-      } else if (e.toString().contains('FormatException')) {
-        print('📋 Data format error - Check request format');
-      }
+      print('Register exception: $e');
       return null;
     }
   }
 
-  static Future<Map<String, dynamic>?> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: headers,
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        print('Login failed: ${response.statusCode} - ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      print('Login error: $e');
-      return null;
+  /// Login existing user
+  static Future<Map<String, dynamic>?> login(
+      {required String email, required String password}) async {
+    final url = '$baseUrl/users/login';
+    final res = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
     }
+    print('Login error: ${res.statusCode} ${res.body}');
+    return null;
   }
 
-  /// User Profile Operations
+  /// Get user profile
   static Future<Map<String, dynamic>?> getUserProfile(String token) async {
+    final url = '$baseUrl/users/profile';
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/users/profile'),
+      final res = await http.get(
+        Uri.parse(url),
         headers: authHeaders(token),
       );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
       }
+      print('Get profile error: ${res.statusCode} ${res.body}');
       return null;
     } catch (e) {
-      print('Get profile error: $e');
+      print('Get profile exception: $e');
       return null;
     }
   }
 
+  /// Update user profile
   static Future<bool> updateUserProfile(
-    String token,
-    Map<String, dynamic> userData,
-  ) async {
+      String token, Map<String, dynamic> userData) async {
+    final url = '$baseUrl/users/profile';
     try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/users/profile'),
+      final res = await http.put(
+        Uri.parse(url),
         headers: authHeaders(token),
         body: jsonEncode(userData),
       );
-
-      return response.statusCode == 200;
+      if (res.statusCode == 200) {
+        return true;
+      }
+      print('Update profile error: ${res.statusCode} ${res.body}');
+      return false;
     } catch (e) {
-      print('Update profile error: $e');
+      print('Update profile exception: $e');
       return false;
     }
   }
 
-  /// Pet Operations
-  static Future<List<Map<String, dynamic>>> getUserPets(String token) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/pets/user'),
-        headers: authHeaders(token),
-      );
+  // ── PET OPERATIONS ─────────────────────────────────────────────────────
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['pets'] ?? []);
-      }
-      return [];
-    } catch (e) {
-      print('Get user pets error: $e');
-      return [];
+  /// Fetch pets belonging to the current user
+  static Future<List<Map<String, dynamic>>> getUserPets(String token) async {
+    final url = '$baseUrl/pets/user';
+    final res = await http.get(
+      Uri.parse(url),
+      headers: authHeaders(token),
+    );
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return List<Map<String, dynamic>>.from(data['pets'] ?? []);
     }
+    return [];
   }
 
+  /// Fetch all available pets
   static Future<List<Map<String, dynamic>>> getAvailablePets(
       String token) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/pets/available'),
-        headers: authHeaders(token),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['pets'] ?? []);
-      }
-      return [];
-    } catch (e) {
-      print('Get available pets error: $e');
-      return [];
+    final url = '$baseUrl/pets/available';
+    final res = await http.get(
+      Uri.parse(url),
+      headers: authHeaders(token),
+    );
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return List<Map<String, dynamic>>.from(data['pets'] ?? []);
     }
+    return [];
   }
 
+  /// Create a new pet
   static Future<Map<String, dynamic>?> createPet(
-    String token,
-    Map<String, dynamic> petData,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/pets'),
-        headers: authHeaders(token),
-        body: jsonEncode(petData),
-      );
-
-      if (response.statusCode == 201) {
-        return jsonDecode(response.body);
-      }
-      return null;
-    } catch (e) {
-      print('Create pet error: $e');
-      return null;
+      String token, Map<String, dynamic> petData) async {
+    final url = '$baseUrl/pets';
+    final res = await http.post(
+      Uri.parse(url),
+      headers: authHeaders(token),
+      body: jsonEncode(petData),
+    );
+    if (res.statusCode == 201) {
+      return jsonDecode(res.body);
     }
+    print('Create pet error: ${res.statusCode} ${res.body}');
+    return null;
   }
 
+  /// Delete a pet by ID
   static Future<bool> deletePet(String token, String petId) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/pets/$petId'),
-        headers: authHeaders(token),
-      );
-
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Delete pet error: $e');
-      return false;
-    }
+    final url = '$baseUrl/pets/$petId';
+    final res = await http.delete(
+      Uri.parse(url),
+      headers: authHeaders(token),
+    );
+    return res.statusCode == 200;
   }
 
-  /// Match Operations
+  // ── MATCH OPERATIONS ────────────────────────────────────────────────────
+
+  /// Create a match between two pets
   static Future<bool> createMatch(
-    String token,
-    String petId,
-    String targetPetId,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/matches'),
-        headers: authHeaders(token),
-        body: jsonEncode({
-          'petId': petId,
-          'targetPetId': targetPetId,
-        }),
-      );
-
-      return response.statusCode == 201;
-    } catch (e) {
-      print('Create match error: $e');
-      return false;
-    }
+      String token, String petId, String targetPetId) async {
+    final url = '$baseUrl/matches';
+    final res = await http.post(
+      Uri.parse(url),
+      headers: authHeaders(token),
+      body: jsonEncode({'petId': petId, 'targetPetId': targetPetId}),
+    );
+    return res.statusCode == 201;
   }
 
+  /// Fetch matches for the current user
   static Future<List<Map<String, dynamic>>> getMatches(String token) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/matches'),
-        headers: authHeaders(token),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['matches'] ?? []);
-      }
-      return [];
-    } catch (e) {
-      print('Get matches error: $e');
-      return [];
+    final url = '$baseUrl/matches';
+    final res = await http.get(
+      Uri.parse(url),
+      headers: authHeaders(token),
+    );
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return List<Map<String, dynamic>>.from(data['matches'] ?? []);
     }
+    return [];
   }
 
-  /// Message Operations
-  static Future<bool> sendMessage(
-      String token, String receiverId, String content,
-      {String type = 'text'}) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/messages'),
-        headers: authHeaders(token),
-        body: jsonEncode({
-          'receiverId': receiverId,
-          'content': content,
-          'type': type,
-        }),
-      );
+  // ── COMMUNITY POSTS ────────────────────────────────────────────────────
 
-      return response.statusCode == 201;
-    } catch (e) {
-      print('Send message error: $e');
-      return false;
-    }
-  }
-
-  static Future<List<Map<String, dynamic>>> getChatMessages(
-    String token,
-    String chatId,
-  ) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/messages/$chatId'),
-        headers: authHeaders(token),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['messages'] ?? []);
-      }
-      return [];
-    } catch (e) {
-      print('Get messages error: $e');
-      return [];
-    }
-  }
-
-  /// Community Posts
+  /// Fetch community posts
   static Future<List<Map<String, dynamic>>> getCommunityPosts(
       String token) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/posts'),
-        headers: authHeaders(token),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['posts'] ?? []);
-      }
-      return [];
-    } catch (e) {
-      print('Get posts error: $e');
-      return [];
+    final url = '$baseUrl/posts';
+    final res = await http.get(
+      Uri.parse(url),
+      headers: authHeaders(token),
+    );
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return List<Map<String, dynamic>>.from(data['posts'] ?? []);
     }
+    return [];
   }
 
+  /// Create a community post
   static Future<bool> createPost(
-    String token,
-    Map<String, dynamic> postData,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/posts'),
-        headers: authHeaders(token),
-        body: jsonEncode(postData),
-      );
-
-      return response.statusCode == 201;
-    } catch (e) {
-      print('Create post error: $e');
-      return false;
-    }
+      String token, Map<String, dynamic> postData) async {
+    final url = '$baseUrl/posts';
+    final res = await http.post(
+      Uri.parse(url),
+      headers: authHeaders(token),
+      body: jsonEncode(postData),
+    );
+    return res.statusCode == 201;
   }
 
-  /// Lost & Found Posts
+  // ── LOST & FOUND ───────────────────────────────────────────────────────
+
+  /// Fetch lost & found posts
   static Future<List<Map<String, dynamic>>> getLostFoundPosts(
       String token) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/lost-found'),
-        headers: authHeaders(token),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['posts'] ?? []);
-      }
-      return [];
-    } catch (e) {
-      print('Get lost/found posts error: $e');
-      return [];
+    final url = '$baseUrl/lostpets';
+    final res = await http.get(
+      Uri.parse(url),
+      headers: authHeaders(token),
+    );
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return List<Map<String, dynamic>>.from(data['posts'] ?? []);
     }
+    return [];
   }
 
+  /// Create a lost & found post
   static Future<bool> createLostFoundPost(
-    String token,
-    Map<String, dynamic> postData,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/lost-found'),
-        headers: authHeaders(token),
-        body: jsonEncode(postData),
-      );
-
-      return response.statusCode == 201;
-    } catch (e) {
-      print('Create lost/found post error: $e');
-      return false;
-    }
+      String token, Map<String, dynamic> postData) async {
+    final url = '$baseUrl/lostpets';
+    final res = await http.post(
+      Uri.parse(url),
+      headers: authHeaders(token),
+      body: jsonEncode(postData),
+    );
+    return res.statusCode == 201;
   }
 
-  /// Uploads an image file to Firebase Storage and returns its public URL.
-  /// If the upload fails `null` is returned.
+  // ── IMAGE UPLOAD ───────────────────────────────────────────────────────
+
+  /// Upload an image file to Firebase Storage and return its public URL
   static Future<String?> uploadImage(File imageFile,
       {String folder = 'uploads'}) async {
-    final url =
-        await StorageService.uploadFile(file: imageFile, folder: folder);
-    return url;
+    try {
+      return await StorageService.uploadFile(file: imageFile, folder: folder);
+    } catch (e) {
+      print('Image upload error: $e');
+      return null;
+    }
   }
 }
