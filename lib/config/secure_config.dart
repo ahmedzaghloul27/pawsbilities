@@ -40,14 +40,19 @@ class SecureConfig {
 
   /// Get API base URL
   static String getApiBaseUrl() {
-    // Use localhost:5001 for local development by default
-    const defaultUrl = 'http://localhost:5001/api';
+    // Use 10.0.2.2 for Android emulator to access host machine's localhost:5001
+    const defaultUrl = 'http://10.0.2.2:5001';
     final envUrl = getEnvVar('API_BASE_URL');
-    return envUrl != null && envUrl.isNotEmpty ? envUrl : defaultUrl;
+
+    final finalUrl = envUrl != null && envUrl.isNotEmpty ? envUrl : defaultUrl;
+
+    return finalUrl;
   }
 
   /// Debug print
   static void printConfigStatus() {
-    print('API Base URL → ${getApiBaseUrl()}');
+    print('🔧 Configuration Status:');
+    print('🔧 API Base URL → ${getApiBaseUrl()}');
+    print('🔧 .env variables loaded: ${_envVars?.length ?? 0}');
   }
 }

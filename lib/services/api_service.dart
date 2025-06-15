@@ -26,11 +26,22 @@ class ApiService {
   /// Try waking up the backend (handles Render cold starts)
   static Future<bool> wakeUpBackend() async {
     try {
+      print('🔥 Waking up backend...');
+
       final response = await http
           .get(Uri.parse(baseUrl), headers: headers)
           .timeout(const Duration(seconds: 30));
+
+      // Check if response contains the expected backend message
+      if (response.statusCode == 200 &&
+          response.body.contains('Pawsibilities Backend API is running')) {
+        print('🔥 Backend is fully awake and responding!');
+        return true;
+      }
+
       return response.statusCode < 500;
-    } catch (_) {
+    } catch (e) {
+      print('🔥 Wake-up failed: $e');
       return false;
     }
   }
@@ -49,6 +60,9 @@ class ApiService {
     String? address,
   }) async {
     final url = '$baseUrl/users/register';
+
+    print('📝 Registering user: $firstName $lastName ($email)');
+
     final body = jsonEncode({
       'firstName': firstName,
       'lastName': lastName,
@@ -71,12 +85,13 @@ class ApiService {
           .timeout(const Duration(seconds: 30));
 
       if (res.statusCode == 201) {
+        print('✅ Registration successful!');
         return jsonDecode(res.body);
       }
-      print('Register error: ${res.statusCode} ${res.body}');
+      print('❌ Registration failed: ${res.statusCode} - ${res.body}');
       return null;
     } catch (e) {
-      print('Register exception: $e');
+      print('💥 Registration error: $e');
       return null;
     }
   }

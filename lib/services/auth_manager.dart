@@ -97,17 +97,29 @@ class AuthManager extends ChangeNotifier {
         address: address,
       );
 
-      if (response != null && response['token'] != null) {
-        _token = response['token'];
+      // Check if registration was successful
+      if (response != null) {
+        print('📝 [AUTH] Registration response: $response');
 
-        // Save token to persistent storage
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', _token!);
+        // If backend returns a token, use it for auto-login
+        if (response['token'] != null) {
+          _token = response['token'];
 
-        // Load user profile
-        await _loadUserProfile();
+          // Save token to persistent storage
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', _token!);
 
-        _isAuthenticated = true;
+          // Load user profile
+          await _loadUserProfile();
+
+          _isAuthenticated = true;
+          print('📝 [AUTH] Registration successful with auto-login');
+        } else {
+          // Registration successful but no auto-login token
+          print(
+              '📝 [AUTH] Registration successful, user needs to login manually');
+        }
+
         _isLoading = false;
         notifyListeners();
         return true;
