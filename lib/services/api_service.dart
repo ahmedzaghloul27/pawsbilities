@@ -46,6 +46,38 @@ class ApiService {
     }
   }
 
+  /// Test backend connectivity
+  static Future<bool> testBackend() async {
+    try {
+      final url = '$baseUrl/users/test';
+      print('🧪 Testing backend at: $url');
+
+      final res = await http.get(Uri.parse(url), headers: headers);
+      print('🧪 Test response: ${res.statusCode} - ${res.body}');
+
+      return res.statusCode == 200;
+    } catch (e) {
+      print('🧪 Backend test failed: $e');
+      return false;
+    }
+  }
+
+  /// Test backend connectivity with authentication
+  static Future<void> testAuthenticatedEndpoint(String token) async {
+    try {
+      final url = '$baseUrl/users/me';
+      print('🧪 Testing authenticated endpoint: $url');
+      print('🔑 Using token: ${token.substring(0, 20)}...');
+
+      final res = await http.get(Uri.parse(url), headers: authHeaders(token));
+
+      print('🧪 Auth test response: ${res.statusCode}');
+      print('🧪 Auth test body: ${res.body}');
+    } catch (e) {
+      print('🧪 Auth test failed: $e');
+    }
+  }
+
   // ── AUTH ───────────────────────────────────────────────────────────────
 
   /// Register a new user
@@ -114,19 +146,36 @@ class ApiService {
 
   /// Get user profile
   static Future<Map<String, dynamic>?> getUserProfile(String token) async {
-    final url = '$baseUrl/users/profile';
+    final url = '$baseUrl/users/me';
+
     try {
+      print('📡 [API] Getting user profile from: $url');
+      print('🔐 [API] Using token: ${token.substring(0, 20)}...');
+      print(
+          '📋 [API] Authorization header: Bearer ${token.substring(0, 20)}...');
+
       final res = await http.get(
         Uri.parse(url),
         headers: authHeaders(token),
       );
+
+      print('📊 [API] Profile response status: ${res.statusCode}');
+      print('📋 [API] Profile response body: ${res.body}');
+      print('📋 [API] Response headers: ${res.headers}');
+
       if (res.statusCode == 200) {
-        return jsonDecode(res.body);
+        final data = jsonDecode(res.body);
+        print('✅ [API] Profile data parsed successfully');
+        return data;
+      } else if (res.statusCode == 401) {
+        print('🔒 [API] Authentication failed - token might be invalid');
+      } else if (res.statusCode == 404) {
+        print('❌ [API] Endpoint not found - check backend routes');
       }
-      print('Get profile error: ${res.statusCode} ${res.body}');
+
       return null;
     } catch (e) {
-      print('Get profile exception: $e');
+      print('💥 [API] Get profile exception: $e');
       return null;
     }
   }

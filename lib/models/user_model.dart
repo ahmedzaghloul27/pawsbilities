@@ -26,7 +26,9 @@ class User {
   String get fullName => '$firstName $lastName';
 
   factory User.fromMap(Map<String, dynamic> map) {
-    return User(
+    print('👤 [USER] Parsing user data: $map');
+
+    final user = User(
       id: map['_id']?.toString() ?? map['id']?.toString() ?? '',
       firstName: map['firstName'] ?? '',
       lastName: map['lastName'] ?? '',
@@ -42,6 +44,10 @@ class User {
           ? DateTime.tryParse(map['updatedAt'].toString())
           : null,
     );
+
+    print(
+        '👤 [USER] Parsed user: ${user.firstName} ${user.lastName} (${user.email})');
+    return user;
   }
 
   Map<String, dynamic> toMap() {

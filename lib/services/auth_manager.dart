@@ -135,16 +135,52 @@ class AuthManager extends ChangeNotifier {
 
   /// Load user profile from API
   Future<void> _loadUserProfile() async {
-    if (_token == null) return;
+    if (_token == null) {
+      print('🚫 [AUTH] Cannot load profile: no token');
+      return;
+    }
 
     try {
+      print('📥 [AUTH] Loading user profile...');
+      print('🔑 [AUTH] Token: ${_token!.substring(0, 20)}...');
+
+      // Test the authentication first
+      await ApiService.testAuthenticatedEndpoint(_token!);
+
       final userData = await ApiService.getUserProfile(_token!);
-      if (userData != null && userData['user'] != null) {
-        _currentUser = User.fromMap(userData['user']);
-        _isAuthenticated = true;
+      print('📋 [AUTH] Profile response: $userData');
+
+      if (userData != null) {
+        Map<String, dynamic>? userMap;
+
+        // Try different response formats
+        if (userData['user'] != null) {
+          // Format: { user: { firstName: "...", ... } }
+          userMap = userData['user'];
+          print('📦 [AUTH] Using nested user data');
+        } else if (userData['data'] != null) {
+          // Format: { data: { firstName: "...", ... } }
+          userMap = userData['data'];
+          print('📦 [AUTH] Using nested data');
+        } else if (userData['firstName'] != null || userData['email'] != null) {
+          // Format: { firstName: "...", lastName: "...", ... }
+          userMap = userData;
+          print('📦 [AUTH] Using direct user data');
+        }
+
+        if (userMap != null) {
+          _currentUser = User.fromMap(userMap);
+          _isAuthenticated = true;
+          print(
+              '✅ [AUTH] Profile loaded successfully: ${_currentUser?.firstName} ${_currentUser?.lastName}');
+        } else {
+          print('❌ [AUTH] No recognizable user data in response');
+        }
+      } else {
+        print('❌ [AUTH] No response data');
       }
     } catch (e) {
-      print('Load profile error: $e');
+      print('💥 [AUTH] Load profile error: $e');
       // If profile loading fails, might be invalid token
       await logout();
     }
